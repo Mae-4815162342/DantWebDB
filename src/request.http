@@ -26,10 +26,8 @@ Content-Type: application/json
     "columnY": "int",
     "columnX": "string"
   },
-  "where": {
-    "column": "age",
-    "value": "10",
-    "condition": "="
-  }
+  "where": [
+    "age", "=", "1","AND","city","=","Paris"
+  ]
 }
 
