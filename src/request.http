@@ -1,0 +1,35 @@
+###
+# Create table
+###
+POST http://localhost:8000/
+Content-Type: application/json
+
+{
+  "feature": "CREATE",
+  "tableName": "Courses",
+  "columns":{
+    "columnY": "int",
+    "columnX": "string"
+  }
+}
+
+###
+# SELECT
+###
+POST http://localhost:8000/
+Content-Type: application/json
+
+{
+  "feature": "SELECT",
+  "tableName": "Courses",
+  "columns":{
+    "columnY": "int",
+    "columnX": "string"
+  },
+  "where": {
+    "column": "age",
+    "value": "10",
+    "condition": "="
+  }
+}
+
