@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @ApplicationPath("/api")
-public class RestApplication extends Application {
+public class App extends Application {
 
     @Override
     public Set<Object> getSingletons() {
