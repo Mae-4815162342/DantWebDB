@@ -8,7 +8,7 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
-@ApplicationPath("/api")
+@ApplicationPath("")
 public class App extends Application {
 
     @Override
