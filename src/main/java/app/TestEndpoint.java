@@ -12,8 +12,8 @@ public class TestEndpoint {
     
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String helloWorld() {
-        return "Hello World";
+    public Response helloWorld() {
+        return Response.ok("Hello World").build();
     }
 
     @GET

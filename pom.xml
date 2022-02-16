@@ -24,6 +24,21 @@
             <artifactId>resteasy-servlet-initializer</artifactId>
             <version>${resteasy.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-multipart-provider</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
         <!-- Json lib -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -38,7 +53,6 @@
     </dependencies>
     <build>
         <finalName>dant</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
