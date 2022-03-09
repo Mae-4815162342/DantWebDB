@@ -21,6 +21,7 @@ public class App extends Application {
         Set<Object> sets = new HashSet<>(1);
         sets.add(new TestEndpoint());
         sets.add(new CreateTable());
+        sets.add(new InsertInto());
         sets.add(new Create());
         sets.add(new Table());
         return sets;
