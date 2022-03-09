@@ -23,6 +23,9 @@ public class Create {
         fic = fic.replaceAll("\\r", "");
         String[] lines = fic.split("\n");
         String[] headers = lines[0].split(",");
+        for(String header : headers){
+            App.headers.add(header);
+        }
         for(int i = 1; i<lines.length -1; i++){
             Map<String, String> line = new HashMap<String, String>();
             String[] content = lines[i].split(",");
