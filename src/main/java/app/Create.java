@@ -22,21 +22,21 @@ public class Create {
         String fic = new String(bytes);
         fic = fic.replaceAll("\\r", "");
         String[] lines = fic.split("\n");
-        String[] headers = lines[0].split(";");
+        String[] headers = lines[0].split(",");
         System.out.println(lines[0]);
         for(String header : headers){
             App.headers.add(header);
         }
         for(int i = 1; i<lines.length -1; i++){
             Map<String, String> line = new HashMap<String, String>();
-            String[] values = lines[i].split(";");
+            String[] values = lines[i].split(",");
             for(int j = 0; j<headers.length-1; j++){
                 line.put(headers[j], values[j]);
             }
             res.add(line);
         }
         return res;
-    } 
+    }
     @POST
     @Consumes("multipart/form-data")
     public Response post(MultipartFormDataInput input) throws IOException {
@@ -47,6 +47,6 @@ public class Create {
         for (InputPart inputPart : inputParts) {
             App.data = parseCSV(inputPart);
         }
-        return Response.ok("Bien reçu").build();
+        return Response.ok(App.data).build();
     }
 }
