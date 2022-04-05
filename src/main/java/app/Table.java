@@ -27,11 +27,13 @@ public class Table {
     public Response get() {
       return Response.ok(App.data).build();
     }
+
     @GET
     @Path("/query")
     public Response get(@Context UriInfo uriInfo){
       Set<Map<String, String>> res = new HashSet<Map<String,String>>();
       MultivaluedMap<String, String> queries  = uriInfo.getQueryParameters();
+
       for(Map<String, String> lines : App.data){
         for(String key : queries.keySet()){
           if(queries.get(key).get(0).equals(lines.get(key))){

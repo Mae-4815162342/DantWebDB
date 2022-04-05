@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/api/create")
 public class Create {
+
     public List<Map<String, String>> parseCSV(InputPart inputPart) throws IOException{
         List<Map<String, String>> res = new ArrayList<Map<String, String>>();
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
@@ -37,6 +38,7 @@ public class Create {
         }
         return res;
     }
+
     @POST
     @Consumes("multipart/form-data")
     public Response post(MultipartFormDataInput input) throws IOException {
