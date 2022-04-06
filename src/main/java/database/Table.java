@@ -1,30 +1,29 @@
 package database;
+import storage.SarahStorage;
 import storage.Storage;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 public class Table {
     private String tableName;
-    private HashMap<String, Row> rows;
+
+    private final Storage rows;
 
     public Table(String tableName) {
         this.tableName = tableName;
-        this.rows = new HashMap<>();
+        this.rows = new SarahStorage();
     }
 
-    public void insertEntry(String rowId, HashMap<String, String> columnsMap) {
-        Row row =  new Row(rowId, columnsMap);
-        rows.put(rowId, row);
+    public void insertEntry(ArrayList<String> columnsMap) {
+        Row row =  new Row(columnsMap);
+        rows.insert(row);
         System.out.println("Successfully added a row");
     }
 
-    public HashMap<String, Row> getRows() {
-        return rows;
-    }
-
-    public void setRows(HashMap<String, Row> rows) {
-        this.rows = rows;
+    public Storage getRows() {
+        return this.rows;
     }
 
     public String getTableName() {

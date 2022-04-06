@@ -1,29 +1,21 @@
 package database;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Row {
-    private String rowId;
-    private HashMap<String, String> columnValuesMap;
+    /* array list containing every column of a row */
+    private ArrayList<String> columnValuesMap = new ArrayList<String>();
 
-    public Row(String rowId, HashMap<String, String> columnsMap) {
-        this.rowId = rowId;
-        this.columnValuesMap = columnsMap;
-    }
-
-    public HashMap<String, String> getColumnValuesMap() {
-        return columnValuesMap;
-    }
-
-    public void setColumnValuesMap(HashMap<String, String> columnValuesMap) {
+    public Row(ArrayList<String> columnValuesMap) {
         this.columnValuesMap = columnValuesMap;
     }
 
-    public String getRowId() {
-        return rowId;
+    public ArrayList<String> getColumnValuesMap() {
+        return this.columnValuesMap;
     }
 
-    public void setRowId(String rowId) {
-        this.rowId = rowId;
+    public void addRow(ArrayList<String> columnValuesMap) {
+        this.columnValuesMap = columnValuesMap;
     }
 }
