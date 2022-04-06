@@ -1,4 +1,6 @@
 package database;
+import storage.Storage;
+
 import java.util.Date;
 import java.util.HashMap;
 

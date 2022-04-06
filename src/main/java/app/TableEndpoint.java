@@ -17,9 +17,9 @@ import java.util.Map;
 
 @Path("/api")
 @Consumes("multipart/form-data")
-public class CreateTable {
+public class TableEndpoint {
     @POST
-    @Path("/createTable")
+    @Path("/table")
     public Response createTable(MultipartFormDataInput input) throws IOException {
         final String TABLE_NAME = "name";
         final String NUMBER_OF_COLUMNS= "columns";

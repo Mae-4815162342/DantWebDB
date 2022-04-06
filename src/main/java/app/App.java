@@ -14,14 +14,13 @@ import java.util.Set;
 
 @ApplicationPath("")
 public class App extends Application {
-    /*TODO replace data by database instance*/
     public static List<Map<String, String>> data;
     public static List<String> headers = new ArrayList<String>();
     @Override
     public Set<Object> getSingletons() {
         Set<Object> sets = new HashSet<>(1);
         sets.add(new TestEndpoint());
-        sets.add(new CreateTable());
+        sets.add(new TableEndpoint());
         sets.add(new Create());
         sets.add(new Table());
         return sets;
