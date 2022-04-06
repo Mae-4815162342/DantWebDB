@@ -5,53 +5,53 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
+
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.nio.ByteBuffer;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 @Path("/api/create")
 public class Create {
-
-    public List<Map<String, ByteBuffer>> parseCSV(InputPart inputPart) throws IOException{
-        long start2 = System.currentTimeMillis();
-
-        List<Map<String, ByteBuffer>> res = new ArrayList<Map<String, ByteBuffer>>();
-        ExecutorService pool = Executors.newCachedThreadPool();
+    final int CHUNK_SIZE = 100_000; 
+    public byte[] parseCSV(InputPart inputPart) throws IOException{
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
+        
         String line = buffer.readLine();
         line = line.replaceAll("\\r", "");
         String[] headers = line.split(",");
-        System.out.println(line);
         for(String header : headers){
             App.headers.add(header);
         }
-        while ((line = buffer.readLine()) != null) {
-            final String lineFinal = line;
-            pool.submit(() -> {
-                Map<String, ByteBuffer> row = new HashMap<String, ByteBuffer>();
-                String[] values = lineFinal.split(",");
-                for(int j = 0; j<headers.length-1; j++){
-                    ByteBuffer value = ByteBuffer.wrap(values[j].getBytes());
-                    row.put(headers[j], value);
-                }
-                res.add(row);
-            });
-        }
-        long end2 = System.currentTimeMillis();      
-        System.out.println("Elapsed Time in milli seconds: "+ (end2-start2));
-        return res;
+        int i = 0;
+        byte[] res = {};
+        while((line = buffer.readLine()) != null){
+            if(res.length + line.getBytes().length < CHUNK_SIZE){
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                outputStream.write(res);
+                outputStream.write((line + "\n").getBytes());
+                res = outputStream.toByteArray();
+            }
+            else{
+                byte[] newRes = {};
+                // Copie du chunk dans une variable de type final
+                res = newRes;
+                // Thread pour envoyer la requête...
+                i++;
+            }
+        } 
+        if(buffer.readLine() == null){
+            System.out.println("Tout lu !");
+        } 
+        System.out.println("Nombre de chunks crées : " + i);
+        return null;
     } 
     @POST
     @GZIP
@@ -60,9 +60,15 @@ public class Create {
         final String UPLOADED_FILE_PARAMETER_NAME = "file";
         
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
+        
         List<InputPart> inputParts = uploadForm.get(UPLOADED_FILE_PARAMETER_NAME);
+
         for (InputPart inputPart : inputParts) {
             App.data = parseCSV(inputPart);
+        }
+        if(App.data != null){
+            System.out.println("Stocké !");
+            System.out.println((long) App.data.length);
         }
         return Response.ok("Bien reçu").build();
     }

@@ -38,10 +38,7 @@ public class Table {
     }
     @GET
     public Response get(){
-      Set<Map<String, String>> res = new HashSet<Map<String,String>>();
-      for(Map<String, ByteBuffer> lines : App.data){
-        res.add(StringBytetoStringString(lines));
-      }
+      String res = new String(App.data.array(), 0, App.data.position());
       return Response.ok(res).build();
     }
     @GET
