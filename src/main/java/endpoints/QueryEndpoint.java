@@ -33,8 +33,8 @@ public class Table {
       Set<Map<String, String>> res = new HashSet<Map<String,String>>();
       MultivaluedMap<String, String> queries  = uriInfo.getQueryParameters();
       for(Map<String, String> lines : App.data){
-        for(String key : queries.keySet()){
-          if(queries.get(key).get(0).equals(lines.get(key))){
+        for(String column : queries.keySet()){
+          if(queries.get(column).get(0).equals(lines.get(column))){
             res.add(lines);
           }
         }

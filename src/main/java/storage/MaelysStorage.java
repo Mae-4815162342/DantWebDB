@@ -2,13 +2,13 @@ package model;
 
 import java.util.ArrayList;
 
-public class ClientTable {
+public class MaelysStorage {
     public String name;
     public ArrayList<String> columnsNames = new ArrayList<>();
     public ArrayList<String> columnsTypes = new ArrayList<>();
     public ArrayList<String> data = new ArrayList<>();
 
-    public ClientTable(String name, ArrayList<Tuple> columns) {
+    public ClientTable(String name, HashMap<String, String> columns) {
         this.name = name;
         for(Tuple column: columns) {
             columnsNames.add((String)column.first);

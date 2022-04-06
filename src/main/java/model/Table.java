@@ -8,22 +8,30 @@ import java.util.HashMap;
 
 public class Table {
     private String tableName;
+    public ArrayList<String> columnsNames = new ArrayList<>();
+    public ArrayList<String> columnsTypes = new ArrayList<>();
 
-    private final Storage rows;
+    private final Storage lines;
 
-    public Table(String tableName) {
+    public Table(String tableName,  HashMap<String, String> columns) {
         this.tableName = tableName;
-        this.rows = new SarahStorage();
+        this.lines = new SarahStorage();
+
+        for(Map.Entry<String, String> entry : columns.entrySet()) {
+            this.columnsNames.add(entry.getKey();
+            this.columnsTypes.add(entry.getValue());
+        }
+
     }
 
     public void insertEntry(ArrayList<String> columnsMap) {
         Row row =  new Row(columnsMap);
-        rows.insert(row);
+        lines.insert(row);
         System.out.println("Successfully added a row");
     }
 
-    public Storage getRows() {
-        return this.rows;
+    public Storage getlines() {
+        return this.lines;
     }
 
     public String getTableName() {

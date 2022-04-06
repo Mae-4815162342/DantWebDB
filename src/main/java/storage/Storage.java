@@ -4,12 +4,14 @@ import database.Row;
 
 import java.util.List;
 
+/* interface générique pour stocker les données */
+
 public interface Storage {
 
-    void insert(Row... row);
+    void insert(T... line);
 
-    void insert(List<Row> rows);
+    void insert(List<T> lines);
 
-    List<Row> selectAll();
+    List<T> selectAll();
 
 }

@@ -3,7 +3,7 @@ import java.util.HashMap;
 
 public class Database {
     private String name;
-    private HashMap<String, Table> tables;
+    private final HashMap<String, Table> tables;
 
     public Database(String name) {
         this.name = name;
@@ -41,4 +41,26 @@ public class Database {
     public void setTables(HashMap<String, Table> tables) {
         this.tables = tables;
     }
+
+    public static  ArrayList<MaelysStorage> getTables() {
+        return tables;
+    }
+
+    public static String showTables() {
+        String res = "";
+        for (MaelysStorage table: tables) {
+            res += table.toString() + ",";
+        }
+        return res;
+    }
+
+    public static MaelysStorage getTableByName(String tableName) {
+        for(MaelysStorage table : tables) {
+            if(table.name.equals(tableName)) {
+                return table;
+            }
+        }
+        return null;
+    }
+    
 }
