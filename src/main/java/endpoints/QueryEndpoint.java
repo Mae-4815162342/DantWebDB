@@ -10,7 +10,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +25,21 @@ import javax.ws.rs.core.UriInfo;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/api/table")
 public class Table {
+    Map<String, String> StringBytetoStringString(Map<String, ByteBuffer> lines) {
+      Map<String, String> line = new HashMap<String, String>();
+      for(String key : App.headers){
+        String value = "";
+        if(lines.get(key)!=null){
+          value = new String(lines.get(key).array());;
+        }
+        line.put(key, value);
+      }
+      return line;
+    }
     @GET
-    public Response get() {
-      return Response.ok(App.data).build();
+    public Response get(){
+      String res = new String(App.data.array(), 0, App.data.position());
+      return Response.ok(res).build();
     }
     @GET
     @Path("/query")

@@ -9,12 +9,11 @@ import javax.ws.rs.core.Application;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @ApplicationPath("")
 public class App extends Application {
-    public static List<Map<String, String>> data;
+    public static byte[] data;
     public static List<String> headers = new ArrayList<String>();
     @Override
     public Set<Object> getSingletons() {
