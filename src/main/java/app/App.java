@@ -2,7 +2,7 @@ package app;
 
 import exception.RuntimeExceptionMapper;
 import filter.GsonProvider;
-
+import endpoints.*;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
@@ -18,10 +18,7 @@ public class App extends Application {
     @Override
     public Set<Object> getSingletons() {
         Set<Object> sets = new HashSet<>(1);
-        sets.add(new TestEndpoint());
         sets.add(new TableEndpoint());
-        sets.add(new Create());
-        sets.add(new Table());
         return sets;
     }
     @Override

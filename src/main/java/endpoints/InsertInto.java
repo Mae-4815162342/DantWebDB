@@ -1,7 +1,7 @@
-package app;
+/*
+package endpoints;
 
-import model.MaelysStorage;
-import model.Structure;
+import storage.MaelysStorage;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -49,3 +49,4 @@ public class InsertInto {
         return Response.ok("Values inserted into " + tableName + "!\n" + MaelysStorage.getData()).build();
     }
 }
+*/

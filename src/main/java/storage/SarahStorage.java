@@ -1,12 +1,12 @@
 package storage;
 
-import database.Row;
+import model.Row;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SarahStorage implements Storage {
+public class SarahStorage implements Storage<Row> {
 
     private final List<Row> rows = new ArrayList<>();
 

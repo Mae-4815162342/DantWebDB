@@ -1,4 +1,4 @@
-package app;
+package endpoints;
 
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;

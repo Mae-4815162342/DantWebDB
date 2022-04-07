@@ -1,12 +1,10 @@
 package storage;
 
-import database.Row;
-
 import java.util.List;
 
 /* interface générique pour stocker les données */
 
-public interface Storage {
+public interface Storage<T>{
 
     void insert(T... line);
 

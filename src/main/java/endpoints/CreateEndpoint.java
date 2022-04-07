@@ -1,25 +1,21 @@
-package app;
+/*
+package endpoints;
 
-import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-
 @Path("/api/create")
-public class Create {
+public class CreateEndpoint {
     final int CHUNK_SIZE = 100_000; 
     public int  sumSizeBuffer(List<ByteArrayOutputStream> buffers){
         int res = 0;
@@ -94,3 +90,4 @@ public class Create {
         return Response.ok("Bien reçu").build();
     }
 }
+*/

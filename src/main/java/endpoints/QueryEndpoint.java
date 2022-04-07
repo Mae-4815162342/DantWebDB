@@ -1,20 +1,16 @@
-package app;
+/*
+package endpoints;
 
-import org.apache.commons.io.IOUtils;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import app.App;
 
-import filter.GsonProvider;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +20,7 @@ import javax.ws.rs.core.UriInfo;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/api/table")
-public class Table {
+public class QueryEndpoint {
     Map<String, String> StringBytetoStringString(Map<String, ByteBuffer> lines) {
       Map<String, String> line = new HashMap<String, String>();
       for(String key : App.headers){
@@ -56,3 +52,4 @@ public class Table {
       return Response.ok(res).build();
     }
 }
+*/
