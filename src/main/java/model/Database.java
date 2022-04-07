@@ -1,4 +1,6 @@
 package model;
+import exception.TableExistsException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,11 +48,11 @@ public class Database {
         return null;
     }
 
-    public void addTable(String tableName, HashMap<String, String> columns){
+    public void addTable(String tableName, HashMap<String, String> columns) throws TableExistsException {
         Table tableExists = getTableByName(tableName);
 
         if (tableExists == null) {
-            /* throw exception */
+            throw new TableExistsException(tableName + " already exists in the database !");
         } else {
             Table newTable = new Table(tableName, columns);
             tables.put(tableName, newTable);

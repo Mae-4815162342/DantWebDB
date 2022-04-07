@@ -8,19 +8,13 @@ import java.util.Map;
 
 public class Table {
     private String tableName;
-    public ArrayList<String> columnsNames = new ArrayList<>();
-    public ArrayList<String> columnsTypes = new ArrayList<>();
-
+    public HashMap<String, String> columns;
     private final SarahStorage lines;
 
-    public Table(String tableName,  HashMap<String, String> columns) {
+    public Table(String tableName, HashMap<String, String> columns) {
         this.tableName = tableName;
         this.lines = new SarahStorage();
-
-        for(Map.Entry<String, String> entry : columns.entrySet()) {
-            this.columnsNames.add(entry.getKey());
-            this.columnsTypes.add(entry.getValue());
-        }
+        this.columns = columns;
     }
 
     public void insertEntry(ArrayList<String> columnsMap) {
@@ -29,8 +23,12 @@ public class Table {
         System.out.println("Successfully added a row");
     }
 
-    public Storage getlines() {
-        return this.lines;
+    public HashMap<String, String> getColumns() {
+        return columns;
+    }
+
+    public SarahStorage getLines() {
+        return lines;
     }
 
     public String getTableName() {

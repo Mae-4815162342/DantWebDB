@@ -5,7 +5,6 @@ POST http://localhost:8080/
 Content-Type: application/json
 
 {
-  "feature": "CREATE",
   "tableName": "Courses",
   "columns":{
     "columnY": "int",
@@ -30,4 +29,6 @@ Content-Type: application/json
     "age", "=", "1","AND","city","=","Paris"
   ]
 }
+
+
 
