@@ -1,8 +1,14 @@
 package controller;
 
 import exception.TableExistsException;
+import exception.TableNotExistsException;
 import model.Database;
+import model.Row;
+import model.Table;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+// methodes recu par les endpoints create table, insert into table, ...
 
 public class Worker {
     private static Database database;
@@ -19,11 +25,15 @@ public class Worker {
         return instance;
     }
 
-
     public static void createTable(String name, HashMap<String, String> columns) throws TableExistsException {
         database.addTable(name,columns);
-        /* try catch pour remonter des erreurs */
     }
 
-    // methodes recu par les endpoints create table, insert into table, ...
+    public static Table getTableByName(String name) throws TableNotExistsException {
+        return database.getTableByName(name);
+    }
+
+    public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
+        database.insertIntoTable(tableName, entry);
+    }
 }

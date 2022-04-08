@@ -1,24 +1,23 @@
 package model;
-import storage.Storage;
-import storage.SarahStorage;
+import storage.RowStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Table {
     private String tableName;
     public HashMap<String, String> columns;
-    private final SarahStorage lines;
+    private final RowStorage lines;
 
     public Table(String tableName, HashMap<String, String> columns) {
         this.tableName = tableName;
-        this.lines = new SarahStorage();
+        this.lines = new RowStorage();
         this.columns = columns;
     }
 
     public void insertEntry(ArrayList<String> columnsMap) {
         Row row =  new Row(columnsMap);
+        System.out.println("Inserting : " + columnsMap);
         lines.insert(row);
         System.out.println("Successfully added a row");
     }
@@ -27,7 +26,7 @@ public class Table {
         return columns;
     }
 
-    public SarahStorage getLines() {
+    public RowStorage getLines() {
         return lines;
     }
 

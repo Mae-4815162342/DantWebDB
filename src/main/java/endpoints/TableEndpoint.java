@@ -15,13 +15,12 @@ import java.io.InputStream;
 import java.util.*;
 
 @Path("/api")
-@Consumes("multipart/form-data")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class TableEndpoint {
 
     @POST
     @Path("/table-json")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createTableFromJson(Table input) {
         /* récupération des informations de la table */
         final String TABLE_NAME = input.getTableName();

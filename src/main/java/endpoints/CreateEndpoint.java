@@ -1,6 +1,6 @@
-/*
 package endpoints;
 
+import app.App;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -31,6 +31,7 @@ public class CreateEndpoint {
             buffer.reset();
         }
     }
+
     public byte[] parseCSV(InputPart inputPart) throws IOException{
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
@@ -90,4 +91,3 @@ public class CreateEndpoint {
         return Response.ok("Bien reçu").build();
     }
 }
-*/

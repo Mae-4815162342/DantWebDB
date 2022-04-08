@@ -1,0 +1,3 @@
+endpoints/CreateEndpoint.class
+exception/TableNotExistsException.class
+endpoints/InsertEndpoint.class

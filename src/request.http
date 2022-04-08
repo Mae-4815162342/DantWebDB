@@ -5,7 +5,7 @@ POST http://localhost:8080/api/table-json
 Content-Type: application/json
 
 {
-  "tableName": "Courses",
+  "tableName": "lol",
   "columns":{
     "columnY": "int",
     "columnX": "string"

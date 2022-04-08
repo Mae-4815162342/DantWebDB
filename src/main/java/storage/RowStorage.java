@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SarahStorage implements Storage<Row> {
+public class RowStorage implements Storage<Row> {
 
     private final List<Row> rows = new ArrayList<>();
 

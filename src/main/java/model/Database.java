@@ -1,6 +1,8 @@
 package model;
 import exception.TableExistsException;
+import exception.TableNotExistsException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,24 +40,35 @@ public class Database {
         }
     }
 
-    public Table getTableByName(String tableName) {
+    public Table getTableByName(String tableName) throws TableNotExistsException {
         for(Map.Entry<String, Table> entry : this.tables.entrySet()) {
             String name = entry.getKey();
             if(name.equals(tableName)){
                 return entry.getValue();
             }
         }
-        return null;
+        throw  new TableNotExistsException(tableName);
     }
 
     public void addTable(String tableName, HashMap<String, String> columns) throws TableExistsException {
-        Table tableExists = getTableByName(tableName);
-
-        if (tableExists != null) {
+        try{
+            /* test if the table is in the database */
+            getTableByName(tableName);
             throw new TableExistsException(tableName + " already exists in the database !");
-        } else {
+
+        } catch (TableNotExistsException e) {
+            /* the table can be added to database */
             Table newTable = new Table(tableName, columns);
             tables.put(tableName, newTable);
+        }
+    }
+
+    public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
+        /* test if the table is in the database */
+        Table table = getTableByName(tableName);
+        if(table != null) {
+            /* the entry can be added to the table */
+            table.insertEntry(entry);
         }
     }
 }

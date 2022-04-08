@@ -1,7 +1,7 @@
 package exception;
 
 public class TableExistsException extends Exception {
-    public TableExistsException(String msg){
-        super(msg);
+    public TableExistsException(String tableName){
+        super(tableName + " already exists in the database !");
     }
 }
