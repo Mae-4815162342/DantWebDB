@@ -51,12 +51,11 @@ public class Database {
     public void addTable(String tableName, HashMap<String, String> columns) throws TableExistsException {
         Table tableExists = getTableByName(tableName);
 
-        if (tableExists == null) {
+        if (tableExists != null) {
             throw new TableExistsException(tableName + " already exists in the database !");
         } else {
             Table newTable = new Table(tableName, columns);
             tables.put(tableName, newTable);
         }
-
     }
 }

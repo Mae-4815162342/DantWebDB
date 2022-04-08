@@ -15,6 +15,7 @@ import java.util.Set;
 public class App extends Application {
     public static byte[] data;
     public static List<String> headers = new ArrayList<String>();
+
     @Override
     public Set<Object> getSingletons() {
         Set<Object> sets = new HashSet<>(1);
