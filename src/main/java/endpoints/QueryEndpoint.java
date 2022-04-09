@@ -1,4 +1,4 @@
-package app;
+package endpoints;
 
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -24,7 +24,7 @@ import javax.ws.rs.core.UriInfo;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/api/table")
-public class Table {
+public class QueryEndpoint {
     Map<String, String> StringBytetoStringString(Map<String, ByteBuffer> lines) {
       Map<String, String> line = new HashMap<String, String>();
       for(String key : App.headers){
@@ -36,11 +36,11 @@ public class Table {
       }
       return line;
     }
-    @GET
+ /*    @GET
     public Response get(){
       String res = new String(App.data.array(), 0, App.data.position());
       return Response.ok(res).build();
-    }
+    } */
     @GET
     @Path("/query")
     public Response get(@Context UriInfo uriInfo){

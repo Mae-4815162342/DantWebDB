@@ -1,6 +1,6 @@
 package storage;
 
-import database.Row;
+import model.Row;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,20 +1,21 @@
-package database;
+package model;
 import java.util.HashMap;
+
+import storage.SarahStorage;
 
 public class Database {
     private String name;
-    private final HashMap<String, Table> tables;
+    private final static HashMap<String, Table> tables = new HashMap<>();
 
     public Database(String name) {
         this.name = name;
-        this.tables = new HashMap<>();
     }
 
     public Table createTable(String tableName) {
         if (tables.containsKey(tableName)) {
             System.out.println(tableName + " already exists, please chose another name");
         } else {
-            Table table = new Table(tableName);
+            Table table = new Table(tableName, null);
             tables.put(tableName, table);
             System.out.println("Table successfully created");
         }
@@ -37,27 +38,18 @@ public class Database {
     public HashMap<String, Table> getTables() {
         return tables;
     }
-
-    public void setTables(HashMap<String, Table> tables) {
-        this.tables = tables;
-    }
-
-    public static  ArrayList<MaelysStorage> getTables() {
-        return tables;
-    }
-
     public static String showTables() {
         String res = "";
-        for (MaelysStorage table: tables) {
+        for (Table table : tables.values()) {
             res += table.toString() + ",";
         }
         return res;
     }
 
-    public static MaelysStorage getTableByName(String tableName) {
-        for(MaelysStorage table : tables) {
-            if(table.name.equals(tableName)) {
-                return table;
+    public static SarahStorage getTableByName(String tableName) {
+        for(String name : tables.keySet()) {
+            if(name.equals(tableName)) {
+                return tables.get(name).getlines();
             }
         }
         return null;

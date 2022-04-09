@@ -1,6 +1,6 @@
 package storage;
 
-import database.Row;
+import model.Row;
 
 import java.util.List;
 
@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface Storage {
 
-    void insert(T... line);
+    void insert(Row... line);
 
-    void insert(List<T> lines);
+    void insert(List<Row> lines);
 
-    List<T> selectAll();
+    List<Row> selectAll();
 
 }

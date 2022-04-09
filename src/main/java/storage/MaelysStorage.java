@@ -1,6 +1,7 @@
-package model;
+package storage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MaelysStorage {
     public String name;
@@ -8,11 +9,11 @@ public class MaelysStorage {
     public ArrayList<String> columnsTypes = new ArrayList<>();
     public ArrayList<String> data = new ArrayList<>();
 
-    public ClientTable(String name, HashMap<String, String> columns) {
+    public MaelysStorage(String name, HashMap<String, String> columns) {
         this.name = name;
-        for(Tuple column: columns) {
-            columnsNames.add((String)column.first);
-            columnsTypes.add((String)column.second);
+        for(String column: columns.keySet()) {
+            columnsNames.add(column);
+            columnsTypes.add(columns.get(column));
         }
     }
 

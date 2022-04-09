@@ -1,10 +1,12 @@
-package app;
+package endpoints;
 
-import model.MaelysStorage;
-import model.Structure;
+import storage.*;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+
+import model.Database;
+import model.Table;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -30,7 +32,7 @@ public class InsertInto {
         String tableName = new String(IOUtils.toByteArray(nameInputStream)).toUpperCase();
         System.out.println("name : " + tableName);
 
-        MaelysStorage MaelysStorage = Structure.getTableByName(tableName);
+        SarahStorage MaelysStorage = Database.getTableByName(tableName);
         if(MaelysStorage == null) {
             return Response.status(400).entity("This table(" + tableName + ") does not exist!\nIf you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
         }
@@ -43,7 +45,7 @@ public class InsertInto {
         String[] lines = fic.split("\n");
 
         for(String line: lines) {
-            MaelysStorage.insertLine(line);
+            MaelysStorage.insert(line);
         }
 
         return Response.ok("Values inserted into " + tableName + "!\n" + MaelysStorage.getData()).build();
