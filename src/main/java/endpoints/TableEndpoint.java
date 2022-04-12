@@ -3,15 +3,9 @@ package endpoints;
 import controller.Worker;
 import exception.TableExistsException;
 import model.Table;
-import org.apache.commons.io.IOUtils;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 @Path("/api")
@@ -22,6 +16,8 @@ public class TableEndpoint {
     @POST
     @Path("/table-json")
     public Response createTableFromJson(Table input) {
+        // TO DO: broadcast to peer the http request to create a table using Network class
+
         /* récupération des informations de la table */
         final String TABLE_NAME = input.getTableName();
         final HashMap<String, String> COLUMNS =  input.getColumns();
@@ -30,6 +26,7 @@ public class TableEndpoint {
             /* ajout dans la database */
             Worker.getInstance();
             Worker.createTable(TABLE_NAME,COLUMNS);
+
             return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
 
         } catch(TableExistsException e) {
