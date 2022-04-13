@@ -43,7 +43,7 @@ public class InsertEndpoint {
 
         /* INSERT INTO TABLE THE DATA*/
         for(String line: lines) {
-            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(";")));
 
             try {
                 Worker.getInstance().insertIntoTable(tableName, entry);

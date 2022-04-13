@@ -1,6 +1,11 @@
 package model;
 
+import java.util.HashMap;
+
+import exception.ColumnNotExistsException;
+import exception.InvalidSelectRequestException;
+
 public interface SelectInterface {
 
-  public String run(String jsonString, Table table);
+  public HashMap<String,String> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException;
 }

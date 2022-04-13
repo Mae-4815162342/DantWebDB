@@ -1,14 +1,16 @@
 package controller;
 
+import exception.ColumnNotExistsException;
+import exception.InvalidSelectRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 import model.Database;
-import model.Row;
 import model.Table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 // methodes recu par les endpoints create table, insert into table, ...
+import java.util.LinkedHashMap;
 
 public class Worker {
     private static Database database;
@@ -25,7 +27,7 @@ public class Worker {
         return instance;
     }
 
-    public static void createTable(String name, HashMap<String, String> columns) throws TableExistsException {
+    public static void createTable(String name, LinkedHashMap<String, String> columns) throws TableExistsException {
         database.addTable(name,columns);
     }
 
@@ -36,7 +38,7 @@ public class Worker {
     public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
         database.insertIntoTable(tableName, entry);
     }
-    public String select(String jsonStr, String type, String table) {
+    public HashMap<String, String> select(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
         return database.select(jsonStr, type, table);
     }
 }
