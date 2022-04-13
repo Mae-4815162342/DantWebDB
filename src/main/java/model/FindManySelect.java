@@ -9,6 +9,7 @@ import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
 
 public class FindManySelect implements SelectInterface{
+  private int take = -1;
   private HashMap<String, Boolean> select;
   private HashMap<String, String> where;
 
@@ -32,12 +33,17 @@ public class FindManySelect implements SelectInterface{
         }
       }
       if(valid){
-
         HashMap<String, String> resulatRow = new HashMap<String,String>();
         for(String targetColumn : selectedLabels){
           resulatRow.put(targetColumn, values.get(columnLabel.indexOf(targetColumn)));
         }
         res.add(resulatRow);
+        if(take != -1){
+          take = take - 1;
+        }
+      }
+      if(take == 0){
+        return res;
       }
     }
     return res;
