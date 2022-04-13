@@ -40,7 +40,6 @@ public class InsertEndpoint {
         String fic = new String(bytes);
         fic = fic.replaceAll("\\r", "");
         String[] lines = fic.split("\n");
-
         /* INSERT INTO TABLE THE DATA*/
         for(String line: lines) {
             ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(";")));
