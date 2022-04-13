@@ -11,6 +11,7 @@ import model.Table;
 import java.util.ArrayList;
 import java.util.HashMap;
 // methodes recu par les endpoints create table, insert into table, ...
+import java.util.LinkedHashMap;
 
 public class Worker {
     private static Database database;
@@ -27,7 +28,7 @@ public class Worker {
         return instance;
     }
 
-    public static void createTable(String name, HashMap<String, String> columns) throws TableExistsException {
+    public static void createTable(String name, LinkedHashMap<String, String> columns) throws TableExistsException {
         database.addTable(name,columns);
     }
 
@@ -39,7 +40,7 @@ public class Worker {
         database.insertIntoTable(tableName, entry);
     }
 
-    public static ArrayList<String> getRowsFromTableWithSimpleParam(String tableName, String request) throws TableNotExistsException, WrongParametersException, ColumnNotInTableException {
+    public ArrayList<String> getRowsFromTableWithSimpleParam(String tableName, String request) throws TableNotExistsException, WrongParametersException, ColumnNotInTableException {
         String[] params = request.split("=");
         String column = params[0];
         String value = params[1];

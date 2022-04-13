@@ -20,6 +20,7 @@ public class Row {
     }
 
     public String getValueInColumn(int index) {
+        System.out.println("Longueur de la ligne : " + columnValuesMap.size());
         return columnValuesMap.get(index);
     }
 

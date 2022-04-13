@@ -19,7 +19,7 @@ public class TableEndpoint {
     public Response createTableFromJson(Table input) {
         /* récupération des informations de la table */
         final String TABLE_NAME = input.getTableName();
-        final HashMap<String, String> COLUMNS =  input.getColumns();
+        final LinkedHashMap<String, String> COLUMNS =  (LinkedHashMap) input.getColumns();
 
         try {
             /* ajout dans la database */

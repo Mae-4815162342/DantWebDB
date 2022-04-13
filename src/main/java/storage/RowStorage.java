@@ -29,7 +29,7 @@ public class RowStorage implements Storage<Row> {
     public ArrayList<String> selectEquals(int columnIndex, String value) {
         ArrayList<String> res = new ArrayList<>();
         for(Row r : rows) {
-            if(r.getValueInColumn(columnIndex) == value) {
+            if(r.getValueInColumn(columnIndex).equals(value)) {
                 res.add(r.toString());
             }
         }

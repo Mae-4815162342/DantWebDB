@@ -5,6 +5,7 @@ import exception.TableNotExistsException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class Database {
         this.tables = new HashMap<>();
     }
 
-    public Table createTable(String tableName, HashMap<String, String> columns ) {
+    public Table createTable(String tableName, LinkedHashMap<String, String> columns ) {
         if (tables.containsKey(tableName)) {
             System.out.println(tableName + " already exists, please chose another name");
         } else {
@@ -52,7 +53,7 @@ public class Database {
         throw  new TableNotExistsException(tableName);
     }
 
-    public void addTable(String tableName, HashMap<String, String> columns) throws TableExistsException {
+    public void addTable(String tableName, LinkedHashMap<String, String> columns) throws TableExistsException {
         try{
             /* test if the table is in the database */
             getTableByName(tableName);
@@ -78,6 +79,7 @@ public class Database {
         Table table = getTableByName(tableName);
         /*get column index in table metradata*/
         int columnIndex = table.getColumnIndex(column);
+        System.out.println("Index de la colonne " + column + " : " + columnIndex);
         /*selecting table rows with params*/
         return table.getRowsWithColumnEquals(columnIndex, value);
     }

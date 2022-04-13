@@ -4,14 +4,16 @@ import storage.RowStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 public class Table {
     private String tableName;
-    public HashMap<String, String> columns;
+    public LinkedHashMap<String, String> columns;
     private final RowStorage lines;
 
-    public Table(String tableName, HashMap<String, String> columns) {
+    public Table(String tableName, LinkedHashMap<String, String> columns) {
         this.tableName = tableName;
         this.lines = new RowStorage();
         this.columns = columns;
@@ -30,9 +32,9 @@ public class Table {
 
     public int getColumnIndex(String column) throws ColumnNotInTableException {
         if(columns.get(column) == null) throw new ColumnNotInTableException(tableName, column);
-        int i = 0;
-        while(columns.get(i) != column) i++;
-        return i;
+        Set<String> labels = columns.keySet();
+        List<String> listLabels = new ArrayList<String>(labels);
+        return listLabels.indexOf(column);
     }
 
     public RowStorage getLines() {

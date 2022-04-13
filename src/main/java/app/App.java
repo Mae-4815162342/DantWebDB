@@ -21,6 +21,7 @@ public class App extends Application {
         Set<Object> sets = new HashSet<>(1);
         sets.add(new TableEndpoint());
         sets.add(new InsertEndpoint());
+        sets.add(new SelectEndpoint());
         return sets;
     }
     @Override
