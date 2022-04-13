@@ -17,9 +17,7 @@ public class Table {
 
     public void insertEntry(ArrayList<String> columnsMap) {
         Row row =  new Row(columnsMap);
-        System.out.println("Inserting : " + columnsMap);
         lines.insert(row);
-        System.out.println("Successfully added a row");
     }
 
     public LinkedHashMap<String, String> getColumns() {
