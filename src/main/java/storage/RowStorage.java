@@ -24,4 +24,15 @@ public class RowStorage implements Storage<Row> {
     public List<Row> selectAll() {
         return rows;
     }
+
+    @Override
+    public ArrayList<String> selectEquals(int columnIndex, String value) {
+        ArrayList<String> res = new ArrayList<>();
+        for(Row r : rows) {
+            if(r.getValueInColumn(columnIndex) == value) {
+                res.add(r.toString());
+            }
+        }
+        return res;
+    }
 }

@@ -1,3 +1,14 @@
-endpoints/CreateEndpoint.class
-exception/TableNotExistsException.class
-endpoints/InsertEndpoint.class
+storage\RowStorage.class
+app\App.class
+model\Row.class
+endpoints\TableEndpoint.class
+filter\GsonProvider.class
+exception\TableNotExistsException.class
+storage\Storage.class
+exception\TableExistsException.class
+exception\RuntimeExceptionMapper.class
+model\Table.class
+endpoints\InsertEndpoint.class
+model\Database.class
+controller\Worker.class
+endpoints\CreateEndpoint.class

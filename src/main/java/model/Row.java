@@ -18,4 +18,12 @@ public class Row {
     public void addRow(ArrayList<String> columnValuesMap) {
         this.columnValuesMap = columnValuesMap;
     }
+
+    public String getValueInColumn(int index) {
+        return columnValuesMap.get(index);
+    }
+
+    public String toString() {
+        return columnValuesMap.toString();
+    }
 }

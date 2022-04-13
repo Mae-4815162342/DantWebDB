@@ -1,7 +1,9 @@
 package controller;
 
+import exception.ColumnNotInTableException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
+import exception.WrongParametersException;
 import model.Database;
 import model.Row;
 import model.Table;
@@ -35,5 +37,13 @@ public class Worker {
 
     public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
         database.insertIntoTable(tableName, entry);
+    }
+
+    public static ArrayList<String> getRowsFromTableWithSimpleParam(String tableName, String request) throws TableNotExistsException, WrongParametersException, ColumnNotInTableException {
+        String[] params = request.split("=");
+        String column = params[0];
+        String value = params[1];
+        if(value == null || column == null) throw new WrongParametersException(request);
+        return database.getRowsWhereColumnEqualsValue(tableName, column, value);
     }
 }

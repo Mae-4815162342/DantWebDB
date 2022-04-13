@@ -1,5 +1,4 @@
-/*
-package endpoints;
+/*package endpoints;
 
 import app.App;
 

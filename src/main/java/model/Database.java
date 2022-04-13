@@ -1,9 +1,11 @@
 package model;
+import exception.ColumnNotInTableException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Database {
@@ -70,5 +72,13 @@ public class Database {
             /* the entry can be added to the table */
             table.insertEntry(entry);
         }
+    }
+
+    public ArrayList<String> getRowsWhereColumnEqualsValue(String tableName, String column, String value) throws TableNotExistsException, ColumnNotInTableException {
+        Table table = getTableByName(tableName);
+        /*get column index in table metradata*/
+        int columnIndex = table.getColumnIndex(column);
+        /*selecting table rows with params*/
+        return table.getRowsWithColumnEquals(columnIndex, value);
     }
 }
