@@ -8,7 +8,6 @@ import model.Database;
 import model.Table;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 // methodes recu par les endpoints create table, insert into table, ...
 import java.util.LinkedHashMap;
 
@@ -38,7 +37,7 @@ public class Worker {
     public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
         database.insertIntoTable(tableName, entry);
     }
-    public HashMap<String, String> select(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
+    public Object select(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
         return database.select(jsonStr, type, table);
     }
 }

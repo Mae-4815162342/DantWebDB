@@ -78,17 +78,20 @@ public class Database {
         }
     }
 
-    public HashMap<String, String> select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
+    public Object select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
         Table table = this.getTableByName(tableName);
         SelectInterface select;
         switch(type){
             case "findUnique":
                 select = gson.fromJson(jsonStr, FindUniqueSelect.class);
                 break;
+            case "findMany":
+                select = gson.fromJson(jsonStr, FindManySelect.class);
+                break;
             default:
                 return null;
         }
-        HashMap<String, String> res = select.run(table);
+        Object res = select.run(table);
         return res;
     }
 }

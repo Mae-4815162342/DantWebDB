@@ -1,7 +1,5 @@
 package endpoints;
 
-import java.util.HashMap;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,7 +23,7 @@ public class SelectEndpoint {
     MultivaluedMap<String, String> queries  = uriInfo.getQueryParameters();
     String tableName = queries.get("table").get(0);
     String type = queries.get("type").get(0);
-    HashMap<String, String> res;
+    Object res;
     try{
       res = Worker.getInstance().select(jsonStr, type, tableName);
     }
