@@ -1,7 +1,6 @@
 package model;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+
 
 public class Row {
     /* array list containing every column of a row */

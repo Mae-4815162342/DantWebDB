@@ -10,8 +10,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,22 +35,24 @@ public class InsertEndpoint {
 
         List<InputPart> fileInput = uploadForm.get(UPLOADED_FILE_PARAMETER_NAME);
         InputStream fileInputStream = fileInput.get(0).getBody(InputStream.class, null);
-        byte[] bytes = IOUtils.toByteArray(fileInputStream );
-        String fic = new String(bytes);
-        fic = fic.replaceAll("\\r", "");
-        String[] lines = fic.split("\n");
+        InputStreamReader reader = new InputStreamReader(fileInputStream);
+        BufferedReader br = new BufferedReader(reader);
 
         /* INSERT INTO TABLE THE DATA*/
-        for(String line: lines) {
-            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+        int i = 0;
+        String line;
+        while((line = br.readLine()) != null && i < 12_000_000 ) {
+            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(";")));
 
             try {
                 Worker.getInstance().insertIntoTable(tableName, entry);
             } catch (TableNotExistsException e) {
                 return Response.status(400).entity(e.getMessage() + "\n If you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
             }
-        }
 
+            i++;
+        }
+        System.out.println("Successfully inserted " + i + " lines !");
         return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!\n").build();
     }
 }

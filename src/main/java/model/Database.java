@@ -1,19 +1,25 @@
 package model;
+import exception.ColumnNotExistsException;
+import exception.InvalidSelectRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.google.gson.Gson;
 
 public class Database {
     private final HashMap<String, Table> tables;
+    private final Gson gson = new Gson();
 
     public Database() {
         this.tables = new HashMap<>();
     }
 
-    public Table createTable(String tableName, HashMap<String, String> columns ) {
+    public Table createTable(String tableName, LinkedHashMap<String, String> columns ) {
         if (tables.containsKey(tableName)) {
             System.out.println(tableName + " already exists, please chose another name");
         } else {
@@ -50,7 +56,7 @@ public class Database {
         throw  new TableNotExistsException(tableName);
     }
 
-    public void addTable(String tableName, HashMap<String, String> columns) throws TableExistsException {
+    public void addTable(String tableName, LinkedHashMap<String, String> columns) throws TableExistsException {
         try{
             /* test if the table is in the database */
             getTableByName(tableName);
@@ -70,5 +76,22 @@ public class Database {
             /* the entry can be added to the table */
             table.insertEntry(entry);
         }
+    }
+
+    public Object select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
+        Table table = this.getTableByName(tableName);
+        SelectInterface select;
+        switch(type){
+            case "findUnique":
+                select = gson.fromJson(jsonStr, FindUniqueSelect.class);
+                break;
+            case "findMany":
+                select = gson.fromJson(jsonStr, FindManySelect.class);
+                break;
+            default:
+                return null;
+        }
+        Object res = select.run(table);
+        return res;
     }
 }
