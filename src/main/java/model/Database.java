@@ -71,4 +71,12 @@ public class Database {
             table.insertEntry(entry);
         }
     }
+
+    public String select(String jsonStr, String type, String table) {
+        switch{
+            case()
+        }
+        SelectInterface select = services.get(type);
+        return null;
+    }
 }
