@@ -30,6 +30,7 @@ public class TableEndpoint {
                 ResteasyClient client = new ResteasyClientBuilder().build();
                 ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
                 TableEndpoint proxy = target.proxy(TableEndpoint.class);
+                System.out.println("Broadcasting to peer " + ipAddress);
                 return proxy.createTableFromJson(input, false);
             }
         }
