@@ -22,24 +22,36 @@ public class TableEndpoint {
     @POST
     @Path("/table-json")
     public Response createTableFromJson(Table input,  @QueryParam("fromClient") boolean fromClient) {
+        final String TABLE_NAME = input.getTableName();
+        final HashMap<String, String> COLUMNS =  input.getColumns();
+
         if (fromClient) {
-            // send request to peers
-            ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
-            for(String ipAddress : peers){
-                String path = "http://" + ipAddress + ":8080/table-json";
-                ResteasyClient client = new ResteasyClientBuilder().build();
-                ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
-                TableEndpoint proxy = target.proxy(TableEndpoint.class);
-                return proxy.createTableFromJson(input, false);
+            try {
+                /* ajout dans la database */
+                Worker.getInstance();
+                Worker.createTable(TABLE_NAME,COLUMNS);
+
+                // send request to peers
+                ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
+                for(String ipAddress : peers){
+                    String path = "http://" + ipAddress + ":8080/table-json";
+                    ResteasyClient client = new ResteasyClientBuilder().build();
+                    ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
+                    TableEndpoint proxy = target.proxy(TableEndpoint.class);
+                    System.out.println("Sending to " + ipAddress);
+                    return proxy.createTableFromJson(input, false);
+                }
+
+                return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
+
+            } catch(TableExistsException e) {
+                return Response.status(400).entity(e.getMessage()).type("plain/text").build();
             }
         }
 
         else {
-            /* récupération des informations de la table */
-            final String TABLE_NAME = input.getTableName();
-            final HashMap<String, String> COLUMNS =  input.getColumns();
-
             try {
+                System.out.println("Receiving from a peer a request to create " + TABLE_NAME);
                 /* ajout dans la database */
                 Worker.getInstance();
                 Worker.createTable(TABLE_NAME,COLUMNS);
@@ -50,6 +62,5 @@ public class TableEndpoint {
                 return Response.status(400).entity(e.getMessage()).type("plain/text").build();
             }
         }
-        return Response.ok("Test").build();
     }
 }
