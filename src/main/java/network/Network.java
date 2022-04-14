@@ -1,5 +1,13 @@
 package network;
 
+import com.sun.mail.iap.Response;
+import endpoints.TableEndpoint;
+import model.Table;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -26,8 +34,11 @@ public class Network {
             String peerIpAddress;
             // reading ip address
             while ((peerIpAddress = br.readLine()) != null){
-                System.out.println(peerIpAddress);
-                peers.add(peerIpAddress);
+                System.out.println("Adding peer with IP address = " + peerIpAddress);
+                // add every peers
+                if (!peerIpAddress.equals(instance.getIpAdress())) {
+                    peers.add(peerIpAddress);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,4 +66,20 @@ public class Network {
         return instance;
     }
 
+    public String getIpAdress() {
+        return ipAdress;
+    }
+
+    public ArrayList<String> getPeersIPAdressesList() {
+        return peersIPAdressesList;
+    }
+
+/*    public static void sendPostRequest(String ipAdress, String endpoint, Class<?> service) {
+        final String path = "http://" + ipAdress + ":8080/" + endpoint;
+
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
+        Object proxy = target.proxy(service)
+
+    }*/
 }

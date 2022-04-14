@@ -36,7 +36,7 @@ public class InsertEndpoint {
 
         List<InputPart> fileInput = uploadForm.get(UPLOADED_FILE_PARAMETER_NAME);
         InputStream fileInputStream = fileInput.get(0).getBody(InputStream.class, null);
-        byte[] bytes = IOUtils.toByteArray(fileInputStream );
+        byte[] bytes = IOUtils.toByteArray(fileInputStream);
         String fic = new String(bytes);
         fic = fic.replaceAll("\\r", "");
         String[] lines = fic.split("\n");
