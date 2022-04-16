@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import com.google.common.base.Splitter;
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
 
@@ -45,7 +44,7 @@ public class FindManySelect implements SelectInterface{
     List<HashMap<String,String>> res = new ArrayList<>();
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      List<String> values = Splitter.on(',').splitToList(row.getColumnValuesMap());
+      List<String> values = row.toList();
       System.out.println(values.size());
       boolean valid = true;
       if(where!=null){

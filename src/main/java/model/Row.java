@@ -1,4 +1,6 @@
 package model;
+import java.util.List;
+import com.google.common.base.Splitter;
 
 
 public class Row {
@@ -15,5 +17,8 @@ public class Row {
 
     public void addRow(String columnValuesMap) {
         this.columnValuesMap = columnValuesMap;
+    }
+    public List<String> toList() {
+        return Splitter.on(',').splitToList(columnValuesMap);
     }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import com.google.common.base.Splitter;
 
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
@@ -28,7 +27,7 @@ public class FindUniqueSelect implements SelectInterface{
     HashMap<String,String> res = new HashMap<>();
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      List<String> values = Splitter.on(',').splitToList(row.getColumnValuesMap());
+      List<String> values = row.toList();
       System.out.println(values.size());
       boolean valid = true;
       for(String targetColumn : where.keySet()){
