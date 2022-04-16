@@ -4,7 +4,6 @@ import exception.InvalidSelectRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -69,9 +68,8 @@ public class Database {
         }
     }
 
-    public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
+    public void insertIntoTable(String entry, Table table ) throws TableNotExistsException {
         /* test if the table is in the database */
-        Table table = getTableByName(tableName);
         if(table != null) {
             /* the entry can be added to the table */
             table.insertEntry(entry);

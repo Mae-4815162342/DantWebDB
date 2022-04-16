@@ -7,7 +7,6 @@ import exception.TableNotExistsException;
 import model.Database;
 import model.Table;
 
-import java.util.ArrayList;
 // methodes recu par les endpoints create table, insert into table, ...
 import java.util.LinkedHashMap;
 
@@ -34,8 +33,8 @@ public class Worker {
         return database.getTableByName(name);
     }
 
-    public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
-        database.insertIntoTable(tableName, entry);
+    public void insertIntoTable(String line, Table table) throws TableNotExistsException {
+        database.insertIntoTable(line, table);
     }
     public Object select(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
         return database.select(jsonStr, type, table);
