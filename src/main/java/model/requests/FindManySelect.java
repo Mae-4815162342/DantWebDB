@@ -1,4 +1,4 @@
-package model;
+package model.requests;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Set;
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
+import model.Row;
+import model.Table;
 
-public class FindManySelect implements SelectInterface{
+public class FindManySelect implements BasicSchema{
   private int limit = -1;
   private Set<String> select;
   private HashMap<String, String> where;

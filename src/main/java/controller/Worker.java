@@ -2,6 +2,7 @@ package controller;
 
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
+import exception.InvalidUpdateRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 import model.Database;
@@ -36,7 +37,11 @@ public class Worker {
     public void insertIntoTable(String line, Table table) throws TableNotExistsException {
         database.insertIntoTable(line, table);
     }
-    public Object select(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
+    public Object select(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
         return database.select(jsonStr, type, table);
+    }
+
+    public Object update(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
+      return database.update(jsonStr, type, table);
     }
 }

@@ -1,8 +1,13 @@
 package model;
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
+import exception.InvalidUpdateRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
+import model.requests.FindManySelect;
+import model.requests.FindUniqueSelect;
+import model.requests.Update;
+import model.requests.BasicSchema;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -76,9 +81,9 @@ public class Database {
         }
     }
 
-    public Object select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
+    public Object select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
         Table table = this.getTableByName(tableName);
-        SelectInterface select;
+        BasicSchema select;
         switch(type){
             case "findUnique":
                 select = gson.fromJson(jsonStr, FindUniqueSelect.class);
@@ -90,6 +95,20 @@ public class Database {
                 return null;
         }
         Object res = select.run(table);
+        return res;
+    }
+
+    public Object update(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
+        Table table = this.getTableByName(tableName);
+        BasicSchema update;
+        switch(type){
+            case "updateUnique":
+            update = gson.fromJson(jsonStr, Update.class);
+                break;
+            default:
+                return null;
+        }
+        Object res = update.run(table);
         return res;
     }
 }

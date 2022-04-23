@@ -1,4 +1,4 @@
-package model;
+package model.requests;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,8 +7,10 @@ import java.util.Set;
 
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
+import model.Row;
+import model.Table;
 
-public class FindUniqueSelect implements SelectInterface{
+public class FindUniqueSelect implements BasicSchema{
   private HashMap<String, Boolean> select;
   private HashMap<String, String> where;
 
