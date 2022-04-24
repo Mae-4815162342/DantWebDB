@@ -10,11 +10,11 @@ import exception.InvalidUpdateRequestException;
 import model.Row;
 import model.Table;
 
-public class Update implements BasicSchema {
+public class DeleteMany implements BasicSchema {
   private HashMap<String, String> data;
   private HashMap<String, String> where;
 
-  private boolean handleRow(Row row, List<String> columnLabel, Set<String> updatedLabels){
+  private Boolean handleRow(Table table, Row row, List<String> columnLabel, Set<String> updatedLabels){
     List<String> values = row.toList();
     boolean valid = true;
     for(String targetColumn : where.keySet()){
@@ -27,12 +27,11 @@ public class Update implements BasicSchema {
       for(String targetColumn : updatedLabels){
         newRow.set(columnLabel.indexOf(targetColumn), data.get(targetColumn));
       }
-      row.addRow(newRow.toString());
-      return true;
+      table.deleteEntry(row);
     }
-    return false;
+    return valid;
   }
-  
+
   @Override
   public Object run(Table table) throws ColumnNotExistsException, InvalidUpdateRequestException {
     if(where==null || data==null){
@@ -41,10 +40,12 @@ public class Update implements BasicSchema {
     Set<String> updatedLabels = data.keySet();
     List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
     List<Row> lines = table.getLines().selectAll();
+    Boolean found = false;
     for(Row row : lines){
-      if(handleRow(row, columnLabel, updatedLabels)){
-        return "Update made successfully";
-      }
+      found = found || handleRow(table, row, columnLabel, updatedLabels);
+    }
+    if(found){
+      return "Deletions made successfully";
     }
     return "Unfound row, please specify an existing row";
   }

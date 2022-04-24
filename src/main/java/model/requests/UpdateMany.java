@@ -10,7 +10,7 @@ import exception.InvalidUpdateRequestException;
 import model.Row;
 import model.Table;
 
-public class Update implements BasicSchema {
+public class UpdateMany implements BasicSchema {
   private HashMap<String, String> data;
   private HashMap<String, String> where;
 
@@ -28,9 +28,8 @@ public class Update implements BasicSchema {
         newRow.set(columnLabel.indexOf(targetColumn), data.get(targetColumn));
       }
       row.addRow(newRow.toString());
-      return true;
     }
-    return false;
+    return valid;
   }
   
   @Override
@@ -41,10 +40,12 @@ public class Update implements BasicSchema {
     Set<String> updatedLabels = data.keySet();
     List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
     List<Row> lines = table.getLines().selectAll();
+    boolean found = false;
     for(Row row : lines){
-      if(handleRow(row, columnLabel, updatedLabels)){
-        return "Update made successfully";
-      }
+      found = found || handleRow(row, columnLabel, updatedLabels);
+    }
+    if(found){
+      return "Updates made successfully";
     }
     return "Unfound row, please specify an existing row";
   }

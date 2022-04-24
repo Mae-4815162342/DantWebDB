@@ -17,6 +17,29 @@ public class FindManySelect implements BasicSchema{
   private HashMap<String, String> where;
   private HashMap<String, String> orderBy;
 
+  private void handleRow(Row row,  List<String> columnLabel,  List<HashMap<String,String>> res){
+    List<String> values = row.toList();
+    System.out.println(values.size());
+    boolean valid = true;
+    if(where!=null){
+      for(String targetColumn : where.keySet()){
+        if(!where.get(targetColumn).equals(values.get(columnLabel.indexOf(targetColumn)))){
+          valid = false;
+        }
+      }
+    }
+    if(valid){
+      HashMap<String, String> resulatRow = new HashMap<String,String>();
+      for(String targetColumn : select){
+        resulatRow.put(targetColumn, values.get(columnLabel.indexOf(targetColumn)));
+      }
+      res.add(resulatRow);
+      if(limit != -1){
+        limit = limit - 1;
+      }
+    }
+  }
+
   private List<HashMap<String,String>> orderResult(List<HashMap<String,String>> res, LinkedHashMap<String, String> columnLabel){
     res.sort(new Comparator<HashMap<String,String>>() {
       @Override
@@ -38,6 +61,7 @@ public class FindManySelect implements BasicSchema{
     });
     return null;
   }
+
   public List<HashMap<String,String>> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException {
     if(select==null){
       select = table.getColumns().keySet(); 
@@ -46,26 +70,7 @@ public class FindManySelect implements BasicSchema{
     List<HashMap<String,String>> res = new ArrayList<>();
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      List<String> values = row.toList();
-      System.out.println(values.size());
-      boolean valid = true;
-      if(where!=null){
-        for(String targetColumn : where.keySet()){
-          if(!where.get(targetColumn).equals(values.get(columnLabel.indexOf(targetColumn)))){
-            valid = false;
-          }
-        }
-      }
-      if(valid){
-        HashMap<String, String> resulatRow = new HashMap<String,String>();
-        for(String targetColumn : select){
-          resulatRow.put(targetColumn, values.get(columnLabel.indexOf(targetColumn)));
-        }
-        res.add(resulatRow);
-        if(limit != -1){
-          limit = limit - 1;
-        }
-      }
+      handleRow(row, columnLabel, res);
       if(limit == 0){
         break;
       }

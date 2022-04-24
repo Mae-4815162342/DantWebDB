@@ -31,6 +31,10 @@ public class Table {
         return tableName;
     }
 
+    public void deleteEntry(Row row){
+        lines.delete(row);
+    }
+
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
