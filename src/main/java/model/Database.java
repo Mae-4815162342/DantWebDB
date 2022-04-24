@@ -7,7 +7,10 @@ import exception.TableNotExistsException;
 import model.requests.FindManySelect;
 import model.requests.FindUniqueSelect;
 import model.requests.Update;
+import model.requests.UpdateMany;
 import model.requests.BasicSchema;
+import model.requests.Delete;
+import model.requests.DeleteMany;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -103,12 +106,31 @@ public class Database {
         BasicSchema update;
         switch(type){
             case "updateUnique":
-            update = gson.fromJson(jsonStr, Update.class);
+                update = gson.fromJson(jsonStr, Update.class);
+                break;
+            case "updateMany":
+                update = gson.fromJson(jsonStr, UpdateMany.class);
                 break;
             default:
                 return null;
         }
         Object res = update.run(table);
+        return res;
+    }
+    public Object delete(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
+        Table table = this.getTableByName(tableName);
+        BasicSchema delete;
+        switch(type){
+            case "deleteUnique":
+            delete = gson.fromJson(jsonStr, Delete.class);
+                break;
+            case "deleteMany":
+            delete = gson.fromJson(jsonStr, DeleteMany.class);
+                break;
+            default:
+                return null;
+        }
+        Object res = delete.run(table);
         return res;
     }
 }

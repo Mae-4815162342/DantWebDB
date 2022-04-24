@@ -44,4 +44,8 @@ public class Worker {
     public Object update(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
       return database.update(jsonStr, type, table);
     }
+
+    public Object delete(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
+        return database.delete(jsonStr, type, table);
+    }
 }
