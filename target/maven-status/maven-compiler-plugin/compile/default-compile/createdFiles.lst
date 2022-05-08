@@ -1,4 +1,5 @@
 exception\InvalidSelectRequestException.class
+exception\WrongGroupBy.class
 exception\TableNotExistsException.class
 exception\ColumnNotExistsException.class
 endpoints\InsertEndpoint.class

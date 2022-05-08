@@ -42,7 +42,7 @@ public class InsertEndpoint {
         int i = 0;
         String line;
         while((line = br.readLine()) != null && i < 12_000_000 ) {
-            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(";")));
+            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
 
             try {
                 Worker.getInstance().insertIntoTable(tableName, entry);
