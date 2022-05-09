@@ -9,6 +9,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 import javax.ws.rs.*;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -33,13 +34,21 @@ public class TableEndpoint {
 
                 // send request to peers
                 ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
+                String path = "http://{ipAddress}:8080/table-json";
+                ResteasyClient client = new ResteasyClientBuilder().build();
+                ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
+
                 for(String ipAddress : peers){
-                    String path = "http://" + ipAddress + ":8080/table-json";
-                    ResteasyClient client = new ResteasyClientBuilder().build();
-                    ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
-                    TableEndpoint proxy = target.proxy(TableEndpoint.class);
                     System.out.println("Sending to " + ipAddress);
-                    return proxy.createTableFromJson(input, false);
+
+                    Response response = target.resolveTemplate("ipAddress", ipAddress)
+                            .queryParam("fromClient", false)
+                            .request(MediaType.APPLICATION_JSON)
+                            .post(Entity.json(input));
+                    System.out.println(response.getStatus());
+                    response.close();
+//                    TableEndpoint proxy = target.proxy(TableEndpoint.class);
+//                    proxy.createTableFromJson(input, false);
                 }
 
                 return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
