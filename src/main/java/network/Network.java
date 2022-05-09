@@ -9,8 +9,12 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import javax.ws.rs.core.UriBuilder;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 
 public class Network {
 
@@ -49,11 +53,20 @@ public class Network {
     public static String getIpAddress() {
         String ip;
         try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-            System.out.println("Your current IP address : " + ip);
-            return ip;
-
-        } catch (UnknownHostException e) {
+            /* on parcours les interfaces réseaux pour obtenir l'adresse ip */
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface netint : Collections.list(nets)){
+                Enumeration<?> e2 = netint.getInetAddresses();
+                while (e2.hasMoreElements()) {
+                    InetAddress inetAddress = (InetAddress) e2.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && !inetAddress.getHostAddress().contains(":")) {
+                        ip = inetAddress.getHostAddress();
+                        System.out.println("Your current IP address : " + ip);
+                        return ip;
+                    }
+                }
+            }
+        } catch (SocketException e) {
             e.printStackTrace();
         }
         return null;
