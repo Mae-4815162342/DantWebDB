@@ -32,4 +32,19 @@ public class SelectEndpoint {
     }
     return Response.ok(res).build();
   }
+
+  @GET
+  @Path("/get/columns")
+  public Response getColumns(@Context UriInfo uriInfo) {
+    MultivaluedMap<String, String> queries  = uriInfo.getQueryParameters();
+    String tableName = queries.get("table").get(0);
+    Object res;
+    try{
+      res = Worker.getInstance().getColumns(tableName);
+    }
+    catch(Exception e){
+      return Response.status(400).entity(e.getMessage() + "\n").type("plain/text").build();
+    }
+    return Response.ok(res).build();
+  }
 }
