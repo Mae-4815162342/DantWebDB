@@ -5,6 +5,7 @@
 *.ear
 *.iml
 *.xml
+*.lst
 
 ## Directory-based project format:
 /.idea

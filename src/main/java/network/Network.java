@@ -2,7 +2,6 @@ package network;
 
 import com.sun.mail.iap.Response;
 import endpoints.TableEndpoint;
-import model.Table;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -79,7 +78,18 @@ public class Network {
 
         ResteasyClient client = new ResteasyClientBuilder().build();
         ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
-        Object proxy = target.proxy(service)
+        return target.proxy(service);
+    }
+
+    public static Response sendPostRequestToPeers(String request, Object parameter, String endpoint, Class<?> service){
+        ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
+
+        for(String ipAddress : peers){
+            String path = "http://" + ipAddress + ":8080/" + endpoint;
+            Object proxy = getProxy(ipAddress, endpoint, service);
+            System.out.println("Sending to " + ipAddress);
+
+        }
 
     }*/
 }
