@@ -35,7 +35,7 @@ public class Network {
             while ((peerIpAddress = br.readLine()) != null){
                 System.out.println("Adding peer with IP address = " + peerIpAddress);
                 // add every peers
-                if (!peerIpAddress.equals(instance.getIpAdress())) {
+                if (!peerIpAddress.equals(getInstance().getIpAdress())) {
                     peers.add(peerIpAddress);
                 }
             }

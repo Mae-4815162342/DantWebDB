@@ -27,35 +27,27 @@ public class TableEndpoint {
         final HashMap<String, String> COLUMNS =  input.getColumns();
 
         if (fromClient==false) {
-            try {
-                /* ajout dans la database */
-                Worker.getInstance();
-                Worker.createTable(TABLE_NAME,COLUMNS);
 
-                // send request to peers
-                ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
-                String path = "http://{ipAddress}:8080/table-json";
-                ResteasyClient client = new ResteasyClientBuilder().build();
-                ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
+            // send request to peers
+            ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
+            String path = "http://{ipAddress}:8080/table-json";
+            ResteasyClient client = new ResteasyClientBuilder().build();
+            ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
 
-                for(String ipAddress : peers){
-                    System.out.println("Sending to " + ipAddress);
+            for(String ipAddress : peers){
+                System.out.println("Sending to " + ipAddress);
 
-                    Response response = target.resolveTemplate("ipAddress", ipAddress)
-                    .queryParam("fromClient", false)
-                    .request(MediaType.APPLICATION_JSON)
-                    .post(Entity.json(input));
-                    System.out.println(response.getStatus());
-                    response.close();
+                Response response = target.resolveTemplate("ipAddress", ipAddress)
+                .queryParam("fromClient", false)
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(input));
+                System.out.println(response.getStatus());
+                response.close();
 //                    TableEndpoint proxy = target.proxy(TableEndpoint.class);
 //                    proxy.createTableFromJson(input, false);
-                }
-
-                return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
-
-            } catch(TableExistsException e) {
-                return Response.status(400).entity(e.getMessage()).type("plain/text").build();
             }
+
+            return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
         }
 
         try {
