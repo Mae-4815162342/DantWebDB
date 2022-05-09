@@ -7,39 +7,69 @@ import java.util.Set;
 
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
+import exception.WrongGroupBy;
 
 public class FindManySelect implements SelectInterface{
   private HashMap<String, Boolean> select;
   private HashMap<String, String> where;
+  private String groupBy;
 
-  public List<HashMap<String,String>> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException {
+  public List<?> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException, WrongGroupBy {
     Set<String> selectedLabels;
+    Boolean hasGroupBy = groupBy != null;
     if(select==null){
       selectedLabels = table.getColumns().keySet(); 
     }
     else{
       selectedLabels = select.keySet();
     }
+    if(hasGroupBy && !selectedLabels.contains(groupBy))
+      throw new WrongGroupBy("GroupBy argument is not a column of selected table");
     List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
-    List<HashMap<String,String>> res = new ArrayList<>();
+    List<HashMap<String,String>> res = null;
+    HashMap<String, List<HashMap<String, String>>> resGroupBy = null;
+    if(hasGroupBy) {
+      resGroupBy = new HashMap<>();
+    } else {
+      res = new ArrayList<>();
+    }
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
       ArrayList<String> values = row.getColumnValuesMap();
+      HashMap<String, String> resulatRow = new HashMap<String, String>();
       boolean valid = true;
-      for(String targetColumn : where.keySet()){
-        if(!where.get(targetColumn).equals(values.get(columnLabel.indexOf(targetColumn)))){
-          valid = false;
+      for(String targetColumn : selectedLabels){
+        int index = columnLabel.indexOf(targetColumn);
+        if(index >= 0) {
+          if(where.get(targetColumn) == null) {
+            //en cas de group by il ne faut pas ajouter la valeur dans le row
+            if(!targetColumn.equals(groupBy)) resulatRow.put(targetColumn, values.get(index));
+          } else {
+            if (!where.get(targetColumn).equals(values.get(index))) {
+              valid = false;
+            } else {
+              //en cas de group by il ne faut pas ajouter la valeur dans le row
+              if(!targetColumn.equals(groupBy)) resulatRow.put(targetColumn, values.get(index));
+            }
+          }
         }
       }
       if(valid){
-
-        HashMap<String, String> resulatRow = new HashMap<String,String>();
-        for(String targetColumn : selectedLabels){
-          resulatRow.put(targetColumn, values.get(columnLabel.indexOf(targetColumn)));
+        if(hasGroupBy) {
+          String columnValue = values.get(columnLabel.indexOf(groupBy));
+          List<HashMap<String,String>> temp = resGroupBy.get(columnValue);
+          if(temp == null) {
+            resGroupBy.put(columnValue, new ArrayList<>());
+            temp = resGroupBy.get(columnValue);
+          }
+          temp.add(resulatRow);
+        } else {
+          res.add(resulatRow);
         }
-        res.add(resulatRow);
       }
     }
-    return res;
+    List<HashMap<String, List<HashMap<String, String>>>> resGB = new ArrayList<>();
+    resGB.add(resGroupBy);
+    return hasGroupBy ? resGB : res;
   }
 }

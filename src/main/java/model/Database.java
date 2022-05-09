@@ -78,7 +78,7 @@ public class Database {
         }
     }
 
-    public Object select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException {
+    public Object select(String jsonStr, String type, String tableName) throws Exception {
         Table table = this.getTableByName(tableName);
         SelectInterface select;
         switch(type){
@@ -91,7 +91,11 @@ public class Database {
             default:
                 return null;
         }
-        Object res = select.run(table);
-        return res;
+        try {
+            Object res = select.run(table);
+            return res;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

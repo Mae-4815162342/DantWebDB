@@ -30,9 +30,11 @@ public class FindUniqueSelect implements SelectInterface{
       ArrayList<String> values = row.getColumnValuesMap();
       boolean valid = true;
       for(String targetColumn : where.keySet()){
-        if(!where.get(targetColumn).equals(values.get(columnLabel.indexOf(targetColumn)))){
-          valid = false;
-        }
+        int index = columnLabel.indexOf(targetColumn);
+        if(index >= 0)
+          if(!where.get(targetColumn).equals(values.get(columnLabel.indexOf(index)))){
+            valid = false;
+          }
       }
       if(valid){
         for(String targetColumn : selectedLabels){
