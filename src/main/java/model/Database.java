@@ -78,6 +78,11 @@ public class Database {
         }
     }
 
+    public Object getColumns(String tableName) throws Exception {
+        Table table = this.getTableByName(tableName);
+        return table.getColumns();
+    }
+
     public Object select(String jsonStr, String type, String tableName) throws Exception {
         Table table = this.getTableByName(tableName);
         SelectInterface select;

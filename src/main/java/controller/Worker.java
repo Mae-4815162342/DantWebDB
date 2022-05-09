@@ -40,4 +40,8 @@ public class Worker {
     public Object select(String jsonStr, String type, String table) throws Exception {
         return database.select(jsonStr, type, table);
     }
+
+    public Object getColumns(String table) throws Exception {
+        return database.getColumns(table);
+    }
 }

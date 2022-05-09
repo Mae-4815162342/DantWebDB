@@ -13,6 +13,7 @@ public class FindManySelect implements SelectInterface{
   private HashMap<String, Boolean> select;
   private HashMap<String, String> where;
   private String groupBy;
+  private Integer limit;
 
   public List<?> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException, WrongGroupBy {
     Set<String> selectedLabels;
@@ -34,7 +35,9 @@ public class FindManySelect implements SelectInterface{
       res = new ArrayList<>();
     }
     List<Row> lines = table.getLines().selectAll();
+    int i = 0;
     for(Row row : lines){
+      if(i++ >= limit) break;
       ArrayList<String> values = row.getColumnValuesMap();
       HashMap<String, String> resulatRow = new HashMap<String, String>();
       boolean valid = true;
