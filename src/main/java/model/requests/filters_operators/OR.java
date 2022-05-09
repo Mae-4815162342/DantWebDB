@@ -1,4 +1,4 @@
-package model.requests.filters;
+package model.requests.filters_operators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +25,8 @@ public class OR implements Operator{
           int value = Integer.parseInt(values.get(columnLabel.indexOf(targetColumn)));
           res = ((query == value) || res);
         }
-        if(OR.get(targetColumn).getClass() == UserFilter.class){
-          UserFilter queries = (UserFilter) OR.get(targetColumn);
+        if(OR.get(targetColumn).getClass() == Filter.class){
+          Filter queries = (Filter) OR.get(targetColumn);
           String value = values.get(columnLabel.indexOf(targetColumn));
           res = (queries.evaluate(value, columns.get(targetColumn)) || res);
         }
