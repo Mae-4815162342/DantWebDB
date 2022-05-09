@@ -7,7 +7,7 @@ import network.Network;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-
+import filter.GsonProvider;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -26,41 +26,46 @@ public class TableEndpoint {
         final String TABLE_NAME = input.getTableName();
         final HashMap<String, String> COLUMNS =  input.getColumns();
 
-        if (fromClient==false) {
-
-            // send request to peers
-            ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
-            String path = "http://{ipAddress}:8080/table-json";
-            ResteasyClient client = new ResteasyClientBuilder().build();
-            ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
-
-            for(String ipAddress : peers){
-                System.out.println("Sending to " + ipAddress);
-
-                Response response = target.resolveTemplate("ipAddress", ipAddress)
-                .queryParam("fromClient", false)
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(input));
-                System.out.println(response.getStatus());
-                response.close();
-//                    TableEndpoint proxy = target.proxy(TableEndpoint.class);
-//                    proxy.createTableFromJson(input, false);
-            }
-
-            return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
-        }
-
         try {
-            System.out.println("Receiving from a peer a request to create " + TABLE_NAME);
+            if (!fromClient) {
+                System.out.println("Receiving from a peer a request to create " + TABLE_NAME);
+            }
             /* ajout dans la database */
             Worker.getInstance();
             Worker.createTable(TABLE_NAME,COLUMNS);
-
-            return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
 
         } catch(TableExistsException e) {
             return Response.status(400).entity(e.getMessage()).type("plain/text").build();
         }
 
+        if (fromClient) {
+            // send request to peers
+            ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
+            ResteasyClient client = new ResteasyClientBuilder().build();
+            client.register(GsonProvider.class);
+
+
+            for(String ipAddress : peers){
+
+                String path = "http://"+ ipAddress + ":8080/api/table-json";
+                ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
+                System.out.println("Sending to " + ipAddress);
+
+                Response response = target
+                        .queryParam("fromClient", false)
+                        .request()
+                        .post(Entity.json(input));
+
+                System.out.println(response.getStatus());
+                response.close();
+
+//                TableEndpoint proxy = target.proxy();
+//                proxy.createTableFromJson(input, false);
+
+            }
+
+            return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
+        }
+        return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
     }
 }
