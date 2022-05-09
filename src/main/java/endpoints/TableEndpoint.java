@@ -26,7 +26,7 @@ public class TableEndpoint {
         final String TABLE_NAME = input.getTableName();
         final HashMap<String, String> COLUMNS =  input.getColumns();
 
-        if (fromClient) {
+        if (fromClient==false) {
             try {
                 /* ajout dans la database */
                 Worker.getInstance();
@@ -42,9 +42,9 @@ public class TableEndpoint {
                     System.out.println("Sending to " + ipAddress);
 
                     Response response = target.resolveTemplate("ipAddress", ipAddress)
-                            .queryParam("fromClient", false)
-                            .request(MediaType.APPLICATION_JSON)
-                            .post(Entity.json(input));
+                    .queryParam("fromClient", false)
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(input));
                     System.out.println(response.getStatus());
                     response.close();
 //                    TableEndpoint proxy = target.proxy(TableEndpoint.class);
@@ -58,18 +58,17 @@ public class TableEndpoint {
             }
         }
 
-        else {
-            try {
-                System.out.println("Receiving from a peer a request to create " + TABLE_NAME);
-                /* ajout dans la database */
-                Worker.getInstance();
-                Worker.createTable(TABLE_NAME,COLUMNS);
+        try {
+            System.out.println("Receiving from a peer a request to create " + TABLE_NAME);
+            /* ajout dans la database */
+            Worker.getInstance();
+            Worker.createTable(TABLE_NAME,COLUMNS);
 
-                return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
+            return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
 
-            } catch(TableExistsException e) {
-                return Response.status(400).entity(e.getMessage()).type("plain/text").build();
-            }
+        } catch(TableExistsException e) {
+            return Response.status(400).entity(e.getMessage()).type("plain/text").build();
         }
+
     }
 }
