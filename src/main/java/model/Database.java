@@ -6,6 +6,7 @@ import exception.TableExistsException;
 import exception.TableNotExistsException;
 import model.requests.FindManySelect;
 import model.requests.FindUniqueSelect;
+import model.requests.GroupBy;
 import model.requests.Update;
 import model.requests.UpdateMany;
 import model.requests.Aggregate;
@@ -97,6 +98,9 @@ public class Database {
                 break;
             case "Aggregate":
                 select = gson.fromJson(jsonStr, Aggregate.class);
+                break;
+            case "groupBy":
+                select = gson.fromJson(jsonStr, GroupBy.class);
                 break;
             default:
                 return null;
