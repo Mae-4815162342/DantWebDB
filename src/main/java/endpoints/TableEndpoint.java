@@ -40,4 +40,3 @@ public class TableEndpoint {
         return Response.ok(responseMessage).build();
     }
 }
-
