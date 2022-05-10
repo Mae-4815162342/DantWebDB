@@ -6,32 +6,36 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
 import model.Row;
 import model.Table;
+import model.requests.filters_operators.Filter;
+import model.requests.filters_operators.Operator;
 
 public class FindManySelect implements BasicSchema{
   private int limit = -1;
   private Set<String> select;
-  private HashMap<String, String> where;
+  private HashMap<String, Filter> where;
   private HashMap<String, String> orderBy;
-
-  private void handleRow(Row row,  List<String> columnLabel,  List<HashMap<String,String>> res){
+  
+  private void handleRow(Row row,  List<String> columnLabel,  List<HashMap<String,String>> res, LinkedHashMap<String, String> columns){
     List<String> values = row.toList();
-    System.out.println(values.size());
     boolean valid = true;
     if(where!=null){
-      for(String targetColumn : where.keySet()){
-        if(!where.get(targetColumn).equals(values.get(columnLabel.indexOf(targetColumn)))){
-          valid = false;
+      for(String targetedColumn : where.keySet()){
+        if(valid){
+          Filter UserFilter = where.get(targetedColumn);
+          String value = values.get(columnLabel.indexOf(targetedColumn));
+					valid = (!value.equals("") ? valid && UserFilter.evaluate(value, columns.get(targetedColumn)) : false);
         }
       }
     }
     if(valid){
       HashMap<String, String> resulatRow = new HashMap<String,String>();
-      for(String targetColumn : select){
-        resulatRow.put(targetColumn, values.get(columnLabel.indexOf(targetColumn)));
+      for(String targetedColumn : select){
+        resulatRow.put(targetedColumn, values.get(columnLabel.indexOf(targetedColumn)));
       }
       res.add(resulatRow);
       if(limit != -1){
@@ -39,7 +43,7 @@ public class FindManySelect implements BasicSchema{
       }
     }
   }
-
+  
   private List<HashMap<String,String>> orderResult(List<HashMap<String,String>> res, LinkedHashMap<String, String> columnLabel){
     res.sort(new Comparator<HashMap<String,String>>() {
       @Override
@@ -70,7 +74,7 @@ public class FindManySelect implements BasicSchema{
     List<HashMap<String,String>> res = new ArrayList<>();
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      handleRow(row, columnLabel, res);
+      handleRow(row, columnLabel, res, table.getColumns());
       if(limit == 0){
         break;
       }
