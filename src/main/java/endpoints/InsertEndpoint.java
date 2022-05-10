@@ -45,15 +45,9 @@ public class InsertEndpoint {
 
 
         /* INSERT INTO TABLE THE DATA*/
-        int i = 0;
-        long start = 0, middle = 0, end = 0;
         String line;
         line = br.readLine();
         while((line = br.readLine()) != null) {
-           /*  start = (i == 999_999 ? System.nanoTime() : 0);
-            //List<String> entry = Splitter.on(',').splitToList(line);
-            //List<String> entry2 = Arrays.asList(line.split(","));
-            middle = (i == 999_999 ? System.nanoTime() : 0); */
             if(!line.equals("")){
                 try {
                     Worker.getInstance().insertIntoTable(line, table);
@@ -61,22 +55,8 @@ public class InsertEndpoint {
                     return Response.status(400).entity(e.getMessage() + "\n If you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
                 }
             }
-            //end = (i == 999_999 ? System.nanoTime() : 0);
-            i++;
         }
-        System.out.println("Temps d'une traduction : " + (middle - start));
-        System.out.println("Temps d'une insertion : " + (end - middle));
-        System.out.println("Successfully inserted " + i + " lines !");
-            return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!\n").build();
+        return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!\n").build();
     }
+    
 }
-
-/* Successfully inserted 10000 lines !
-Moyenne du temps de création de l'Arraylist : 1305
-Moyenne du temps de l'insertion dans la DB : 671
- */
-
-/* Successfully inserted 10000 lines !
-Moyenne du temps de création de l'Arraylist : 3880
-Moyenne du temps de l'insertion dans la DB : 775
-*/
