@@ -1,17 +1,18 @@
 package network;
 
-import com.sun.mail.iap.Response;
-import endpoints.TableEndpoint;
+import filter.GsonProvider;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -87,23 +88,29 @@ public class Network {
         return peersIPAdressesList;
     }
 
-/*    public static void sendPostRequest(String ipAdress, String endpoint, Class<?> service) {
-        final String path = "http://" + ipAdress + ":8080/" + endpoint;
-
+    public Response sendPostRequest(String path, Object input, String mediaType, String responseMessage){
+        ArrayList<String> peers = getPeersIPAdressesList();
         ResteasyClient client = new ResteasyClientBuilder().build();
-        ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
-        return target.proxy(service);
-    }
+        String baseURI = "http://{ipAddress}:8080/api";
+        client.register(GsonProvider.class);
+        ResteasyWebTarget target = client.target(UriBuilder.fromPath(baseURI));
+        try{
+            for(String ipAddress : peers){
+                System.out.println("• Sending post request to " + ipAddress);
 
-    public static Response sendPostRequestToPeers(String request, Object parameter, String endpoint, Class<?> service){
-        ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
+                Response response = target
+                        .path(path)
+                        .resolveTemplate("ipAddress", ipAddress)
+                        .queryParam("fromClient", false)
+                        .request()
+                        .post(Entity.entity(input, mediaType));
 
-        for(String ipAddress : peers){
-            String path = "http://" + ipAddress + ":8080/" + endpoint;
-            Object proxy = getProxy(ipAddress, endpoint, service);
-            System.out.println("Sending to " + ipAddress);
-
+                System.out.println("--> Status code :" + response.getStatus());
+                response.close();
+            }
+        }catch(Exception e){
+            return Response.ok(e.getMessage()).build();
         }
-
-    }*/
+        return Response.ok(responseMessage).build();
+    }
 }
