@@ -8,6 +8,7 @@ import model.requests.FindManySelect;
 import model.requests.FindUniqueSelect;
 import model.requests.Update;
 import model.requests.UpdateMany;
+import model.requests.Aggregate;
 import model.requests.BasicSchema;
 import model.requests.Delete;
 import model.requests.DeleteMany;
@@ -93,6 +94,9 @@ public class Database {
                 break;
             case "findMany":
                 select = gson.fromJson(jsonStr, FindManySelect.class);
+                break;
+            case "Aggregate":
+                select = gson.fromJson(jsonStr, Aggregate.class);
                 break;
             default:
                 return null;
