@@ -52,10 +52,8 @@ public class CreateEndpoint {
                 if((i%5) == 0){
                     sendChunks(buffers);
                 }
-                else{
-                    buffers.get(i % 5).append(line + "\n");
-                    countLine++;
-                }
+                buffers.get(i % 5).append(line + "\n");
+                countLine++;
             }
         } 
         sendChunks(buffers);

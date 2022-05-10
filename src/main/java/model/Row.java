@@ -19,6 +19,6 @@ public class Row {
         this.columnValuesMap = columnValuesMap;
     }
     public List<String> toList() {
-        return Splitter.on(',').splitToList(columnValuesMap);
+        return Splitter.on(';').splitToList(columnValuesMap);
     }
 }
