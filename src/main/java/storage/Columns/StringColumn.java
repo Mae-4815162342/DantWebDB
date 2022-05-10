@@ -1,8 +1,10 @@
-package storage;
+package storage.Columns;
+
+import storage.Columns.Column;
 
 import java.util.ArrayList;
 
-public class StringColumn implements Column<String>{
+public class StringColumn implements Column<String> {
     public ArrayList<String> values;
 
     public StringColumn(){

@@ -1,4 +1,4 @@
-package storage;
+package storage.Columns;
 
 public interface Column<T> {
 

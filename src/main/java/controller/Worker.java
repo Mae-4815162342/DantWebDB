@@ -26,7 +26,7 @@ public class Worker {
         return instance;
     }
 
-    public static void createTable(String name, LinkedHashMap<String, String> columns) throws TableExistsException {
+    public static void createTable(String name, LinkedHashMap<String, String> columns) throws TableExistsException{
         database.addTable(name,columns);
     }
 

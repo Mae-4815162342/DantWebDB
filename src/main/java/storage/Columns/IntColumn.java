@@ -1,6 +1,8 @@
-package storage;
+package storage.Columns;
 
-public class IntColumn implements Column<Integer>{
+import storage.Columns.Column;
+
+public class IntColumn implements Column<Integer> {
 
     @Override
     public Integer equal(Integer value) {

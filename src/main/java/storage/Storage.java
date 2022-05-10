@@ -12,4 +12,6 @@ public interface Storage<T>{
 
     List<T> selectAll();
 
+    void delete(T line);
+
 }

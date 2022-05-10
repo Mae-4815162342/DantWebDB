@@ -1,8 +1,9 @@
-package storage;
+package storage.Columns;
 
 import org.apache.james.mime4j.field.datetime.DateTime;
+import storage.Columns.Column;
 
-public class DatetimeColumn implements Column<DateTime>{
+public class DatetimeColumn implements Column<DateTime> {
     @Override
     public DateTime equal(DateTime value) {
         return null;

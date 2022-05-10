@@ -1,6 +1,8 @@
-package storage;
+package storage.Columns;
 
-public class FloatColumn implements Column<Float>{
+import storage.Columns.Column;
+
+public class FloatColumn implements Column<Float> {
     @Override
     public Float equal(Float value) {
         return null;
