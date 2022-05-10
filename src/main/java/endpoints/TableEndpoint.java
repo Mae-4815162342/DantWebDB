@@ -42,26 +42,27 @@ public class TableEndpoint {
             // send request to peers
             ArrayList<String> peers = Network.getInstance().getPeersIPAdressesList();
             ResteasyClient client = new ResteasyClientBuilder().build();
+            String path = "http://{ipAddress}:8080/api";
             client.register(GsonProvider.class);
-
+            ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
 
             for(String ipAddress : peers){
-
-                String path = "http://"+ ipAddress + ":8080/api/table-json";
-                ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
                 System.out.println("Sending to " + ipAddress);
 
                 Response response = target
+                        .path("/table-json")
+                        .resolveTemplate("ipAddress", ipAddress)
                         .queryParam("fromClient", false)
                         .request()
-                        .post(Entity.json(input));
+                        .post(Entity.entity(input, MediaType.APPLICATION_JSON));
 
                 System.out.println(response.getStatus());
                 response.close();
-
-//                TableEndpoint proxy = target.proxy();
-//                proxy.createTableFromJson(input, false);
-
+                /* TODO: code refacto : sendPostToPeers / sendGetToPeers / sendPutToPeers
+                * need : MediaType.APPLICATION_JSON / MediaType.MULTIPART_FORM_DATA_TYPE
+                * the parameter (csv file for insert, json request for create, select...)
+                * queryParam 'from client'
+                * */
             }
 
             return Response.ok("Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS).build();
