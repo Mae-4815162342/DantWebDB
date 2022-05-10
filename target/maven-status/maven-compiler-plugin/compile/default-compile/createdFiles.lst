@@ -1,3 +1,4 @@
-endpoints/CreateEndpoint.class
-exception/TableNotExistsException.class
-endpoints/InsertEndpoint.class
+exception\TableNotExistsException.class
+endpoints\InsertEndpoint.class
+endpoints\CreateEndpoint.class
+network\Network.class
