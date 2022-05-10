@@ -18,7 +18,7 @@ public class TableEndpoint {
     @Path("/table-json")
     public Response createTableFromJson(Table input,  @QueryParam("fromClient") boolean fromClient) {
         final String TABLE_NAME = input.getTableName();
-        final HashMap<String, String> COLUMNS =  input.getColumns();
+        final LinkedHashMap<String, String> COLUMNS =  input.getColumns();
         String responseMessage = "Table created:" + TABLE_NAME + " \n With columns : " + COLUMNS;
 
         try {

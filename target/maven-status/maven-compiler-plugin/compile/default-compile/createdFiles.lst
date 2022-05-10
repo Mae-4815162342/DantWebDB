@@ -1,3 +1,9 @@
-endpoints/CreateEndpoint.class
-exception/TableNotExistsException.class
-endpoints/InsertEndpoint.class
+exception\InvalidSelectRequestException.class
+exception\WrongGroupBy.class
+exception\TableNotExistsException.class
+exception\ColumnNotExistsException.class
+endpoints\InsertEndpoint.class
+endpoints\CreateEndpoint.class
+model\FindUniqueSelect.class
+model\SelectInterface.class
+model\FindManySelect.class

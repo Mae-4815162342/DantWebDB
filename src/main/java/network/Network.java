@@ -62,8 +62,8 @@ public class Network {
                     InetAddress inetAddress = (InetAddress) e2.nextElement();
                     if (!inetAddress.isLoopbackAddress() && !inetAddress.getHostAddress().contains(":")) {
                         ip = inetAddress.getHostAddress();
-                        System.out.println("Your current IP address : " + ip);
-                        return ip;
+            System.out.println("Your current IP address : " + ip);
+            return ip;
                     }
                 }
             }
