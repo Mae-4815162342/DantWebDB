@@ -6,6 +6,7 @@ import exception.TableNotExistsException;
 import network.Network;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
@@ -21,13 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 
-@Path("/api/insertFile")
-public class CreateEndpoint {
-    final int CHUNK_SIZE = 100_000;
-    final Network net = Network.getInstance();
+@Path("/api")
+public class InsertDataEndpoint {
+    private static final int CHUNK_SIZE = 100_000;
+    private final Network net = Network.getInstance();
 
     public void sendChunk(StringBuffer buffer, String tableName) {
-        net.sendDataToPeer(buffer, tableName, "/insertIntoTable", MediaType.APPLICATION_JSON);
+        //forward chunk to a peers
+        net.sendDataToPeer(buffer, tableName, "/api/chunk", MediaType.APPLICATION_JSON);
         //vider le buffer
         buffer.delete(0, buffer.length());
     }
@@ -66,12 +68,15 @@ public class CreateEndpoint {
             }
         }
         sendChunk(bufferToSend, tableName);
+        inputStream.close();
+        buffer.close();
     }
 
     @POST
     @GZIP
     @Consumes("multipart/form-data")
-    public Response post(@GZIP MultipartFormDataInput input) throws IOException {
+    @Path("/upload")
+    public Response uploadFile(@GZIP MultipartFormDataInput input) throws IOException {
         final String UPLOADED_FILE_PARAMETER_NAME = "file";
         final String TABLE_NAME = "tableName";
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
@@ -85,6 +90,25 @@ public class CreateEndpoint {
         for (InputPart inputPart : inputParts) {
             parseCSV(inputPart, TABLE_NAME);
         }
+        nameInputStream.close();
         return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!\n").build();
+    }
+
+
+    @POST
+    @Path("/chunk")
+    public Response insertInto(StringBuffer chunk, @QueryParam("tableName") String tableName) {
+        /* INSERT INTO TABLE THE DATA*/
+        String[] lines = chunk.toString().split("\n");
+        for (String line : lines) {
+            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+
+            try {
+                Worker.getInstance().insertIntoTable(tableName, entry);
+            } catch (TableNotExistsException e) {
+                return Response.status(400).entity(e.getMessage() + "\n If you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
+            }
+        }
+        return Response.ok("Values inserted into " + tableName + "!\n").build();
     }
 }
