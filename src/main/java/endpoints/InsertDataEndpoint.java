@@ -54,6 +54,7 @@ public class InsertDataEndpoint {
                 countLine++;
                 if (countLine >= CHUNK_SIZE) {
                     peers++;
+                    countLine = 1;
                 }
             } else {
                 bufferToSend.append(line + "\n");
