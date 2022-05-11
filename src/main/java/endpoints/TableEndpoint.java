@@ -37,6 +37,6 @@ public class TableEndpoint {
         } catch(TableExistsException e) {
             return Response.status(400).entity(e.getMessage()).type("plain/text").build();
         }
-        return Response.ok(responseMessage).build();
+        return Response.ok("ici " + responseMessage).build();
     }
 }
