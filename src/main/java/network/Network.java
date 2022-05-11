@@ -35,12 +35,11 @@ public class Network {
     }
 
     public int getNumberOfPeers() {
-        return getInstance().peersIPAdressesList.size();
+        return peersIPAdressesList.size();
     }
 
     private ArrayList<String> getPeersIpAdresses() {
         ArrayList<String> peers = new ArrayList<>();
-
         // file containing ip adresses of machines
         File file = new File("./src/main/java/machine_information.txt");
         try {
@@ -91,19 +90,15 @@ public class Network {
     }
 
     private ResteasyClient getClient() {
-        return getInstance().client;
+        return client;
     }
 
     public String getIpAdress() {
-        return getInstance().ipAdress;
-    }
-
-    public ArrayList<String> getPeersIPAdressesList() {
-        return getInstance().peersIPAdressesList;
+        return ipAdress;
     }
 
     public Response sendPostRequest(String path, Object input, String mediaType, String responseMessage) {
-        ArrayList<String> peers = getPeersIPAdressesList();
+        ArrayList<String> peers = peersIPAdressesList;
 
         ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
         try {
@@ -138,7 +133,7 @@ public class Network {
 
         ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
         try {
-            String ipAddress = getPeersIpAdresses().get(nextPeer);
+            String ipAddress = peersIPAdressesList.get(nextPeer);
             goToNextPeer();
             System.out.println("• Sending data request to " + ipAddress);
 
