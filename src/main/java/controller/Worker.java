@@ -37,6 +37,7 @@ public class Worker {
     public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
         database.insertIntoTable(tableName, entry);
     }
+
     public Object select(String jsonStr, String type, String table) throws Exception {
         return database.select(jsonStr, type, table);
     }

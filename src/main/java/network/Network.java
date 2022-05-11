@@ -126,6 +126,14 @@ public class Network {
         return Response.ok(responseMessage).build();
     }
 
+    private void goToNextPeer() {
+        if (nextPeer % getNumberOfPeers() == 0) {
+            nextPeer = 0;
+        } else {
+            nextPeer++;
+        }
+    }
+
     public Response sendDataToPeer(StringBuffer buffer, String tableName, String path, String mediaType) {
 
         ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
