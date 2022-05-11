@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
@@ -19,9 +20,9 @@ public class GroupBy implements BasicSchema{
   private int limit = -1;
   private Set<String> select;
   private HashMap<String, Filter> where;
-  private HashMap<String, String> orderBy;
+  private HashMap<String, Filter> orderBy;
   private Set<String> by;
-  private HashMap<String, HashMap<String, Integer>> having;
+  private HashMap<String, HashMap<String, Filter>>  having;
   private Set<String> _count;
   private Set<String> _avg;
   private Set<String> _max;
@@ -36,7 +37,23 @@ public class GroupBy implements BasicSchema{
     }
     return res;
   } 
-
+  private Collection<HashMap<String, Object>> applyHaving(Collection<HashMap<String, Object>> res) {
+    if(having!=null){
+      Predicate<HashMap<String,Object>> filterEngine = group -> {
+        boolean valid = true;
+        for(String key : having.keySet()){
+          HashMap<String, Filter> condition = having.get(key);
+          HashMap<String, Double> result = (HashMap<String, Double>) group.get(key);
+          for(String column : condition.keySet()){
+            valid = valid && condition.get(column).evaluate(result.get(column).toString(), "int");
+          }
+        }
+        return !valid;
+      };
+      res.removeIf(filterEngine);
+    }
+    return res;
+  }
   private HashMap<String, Object> createGroup(Row row, List<String> columnLabel, LinkedHashMap<String, String> columns) throws ColumnNotExistsException{
     HashMap<String, Object> res = new HashMap<>();
     List<String> rowList = row.toList();
@@ -209,7 +226,7 @@ public class GroupBy implements BasicSchema{
     return null;
   } */
 
-  private void handleRow(HashMap<Set<String>, Integer> groupWorkforce, HashMap<Set<String>, HashMap<String, Object>> groups, Row row,  List<String> columnLabel,  List<HashMap<String, Object>> res, LinkedHashMap<String, String> columns) throws ColumnNotExistsException{
+  private void handleRow(HashMap<Set<String>, Integer> groupWorkforce, HashMap<Set<String>, HashMap<String, Object>> groups, Row row,  List<String> columnLabel, LinkedHashMap<String, String> columns) throws ColumnNotExistsException{
     List<String> values = row.toList();
     boolean valid = true;
     if(where!=null){
@@ -250,12 +267,12 @@ public class GroupBy implements BasicSchema{
     List<HashMap<String, Object>> res = new ArrayList<>();
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      handleRow(groupWorkforce, groups, row, columnLabel, res, table.getColumns());
+      handleRow(groupWorkforce, groups, row, columnLabel, table.getColumns());
       if(limit == 0){
         break;
       }
     }
     calculateAverage(groupWorkforce, groups);
-    return groups.values();
+    return applyHaving(groups.values());
   }
 }

@@ -14,7 +14,7 @@ public class Filter {
   private String contains;
   private String startsWith;
   private String endsWith;
-
+  
   public boolean evaluate(String value, String type){
     boolean valid = true;
     valid = (equals!=null ? (type.equals("String") ? true && (value.equals((String) equals)) : true && (Double.parseDouble(value) == ((Double) equals))) : valid);
