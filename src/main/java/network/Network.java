@@ -1,5 +1,6 @@
 package network;
 
+import com.sun.mail.iap.ByteArray;
 import filter.GsonProvider;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;

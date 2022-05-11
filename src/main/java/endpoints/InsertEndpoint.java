@@ -1,5 +1,6 @@
 package endpoints;
 
+import com.sun.mail.iap.ByteArray;
 import controller.Worker;
 import exception.TableNotExistsException;
 import org.apache.commons.io.IOUtils;

@@ -1,5 +1,8 @@
 package endpoints;
 
+import com.sun.mail.iap.ByteArray;
+import controller.Worker;
+import exception.TableNotExistsException;
 import network.Network;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.annotations.GZIP;
@@ -13,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -21,45 +25,48 @@ public class CreateEndpoint {
     final int CHUNK_SIZE = 100_000;
     final Network net = Network.getInstance();
 
-    public void sendChunks(List<StringBuffer> buffers, String tableName) {
-        //envoi de requête /insertIntoTable
-        System.out.println("ON VIDE");
-        for (StringBuffer buffer : buffers) {
-            buffer.delete(0, buffer.length());
-            net.getInstance().sendDataToPeer(buffer, tableName, '/insertIntoTable', MediaType.APPLICATION_JSON);
-        }
+    public void sendChunk(StringBuffer buffer, String tableName) {
+        net.sendDataToPeer(buffer, tableName, "/insertIntoTable", MediaType.APPLICATION_JSON);
+        //vider le buffer
+        buffer.delete(0, buffer.length());
     }
 
-    public byte[] parseCSV(InputPart inputPart) throws IOException {
+    public void parseCSV(InputPart inputPart, String tableName) throws IOException {
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
-
-        /* stock chunk of csv file */
-        List<StringBuffer> buffers = new ArrayList<StringBuffer>();
-        for (int j = 0; j < 5; j++) {
-            buffers.add(new StringBuffer());
-        }
-
+        StringBuffer bufferToSend = new StringBuffer();
         String line;
-        int i = 0;
+        int NB_PEERS = net.getNumberOfPeers();
         int countLine = 0;
+        int peers = 0;
         while ((line = buffer.readLine()) != null) {
-            if (countLine < CHUNK_SIZE) {
-                buffers.get(i % 5).append(line + "\n");
+            if (peers % NB_PEERS == 0) {
+                // on stock dans la machine actuelle
+                try {
+                    ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+                    Worker.getInstance().insertIntoTable(tableName, entry);
+                } catch (TableNotExistsException e) {
+                    e.printStackTrace();
+                }
                 countLine++;
+                if (countLine >= CHUNK_SIZE) {
+                    peers++;
+                }
             } else {
-                i++;
-                if ((i % 5) == 0) {
-                    sendChunks(buffers);
-                } else {
-                    buffers.get(i % 5).append(line + "\n");
+                bufferToSend.append(line + "\n");
+                if (countLine < CHUNK_SIZE) {
                     countLine++;
+                } else {
+                    //on envoie à un des peers
+                    sendChunk(bufferToSend, tableName);
+                    countLine = 1;
+                    peers++;
                 }
             }
         }
-        sendChunks(buffers);
-        return null;
-    } 
+        sendChunk(bufferToSend, tableName);
+    }
+
     @POST
     @GZIP
     @Consumes("multipart/form-data")
