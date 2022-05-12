@@ -12,7 +12,6 @@ import exception.InvalidSelectRequestException;
 import model.Row;
 import model.Table;
 import model.requests.filters_operators.Filter;
-import model.requests.filters_operators.Operator;
 
 public class FindManySelect implements BasicSchema{
   private int limit = -1;
