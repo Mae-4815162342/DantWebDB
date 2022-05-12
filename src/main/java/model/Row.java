@@ -1,20 +1,24 @@
 package model;
-import java.util.ArrayList;
+import java.util.List;
+import com.google.common.base.Splitter;
 
 
 public class Row {
     /* array list containing every column of a row */
-    private ArrayList<String> columnValuesMap;
+    private String columnValuesMap;
 
-    public Row(ArrayList<String> columnValuesMap) {
-        this.columnValuesMap = columnValuesMap;
+    public Row(String line) {
+        this.columnValuesMap = line;
     }
 
-    public ArrayList<String> getColumnValuesMap() {
+    public String getColumnValuesMap() {
         return this.columnValuesMap;
     }
 
-    public void addRow(ArrayList<String> columnValuesMap) {
+    public void addRow(String columnValuesMap) {
         this.columnValuesMap = columnValuesMap;
+    }
+    public List<String> toList() {
+        return Splitter.on(';').splitToList(columnValuesMap);
     }
 }

@@ -24,4 +24,8 @@ public class RowStorage implements Storage<Row> {
     public List<Row> selectAll() {
         return rows;
     }
+
+    public void delete(Row row) {
+        rows.remove(row);
+    }
 }
