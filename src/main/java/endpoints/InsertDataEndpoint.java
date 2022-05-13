@@ -28,8 +28,9 @@ public class InsertDataEndpoint {
     private final Network net = Network.getInstance();
 
     public void sendChunk(StringBuffer buffer, String tableName) {
+        System.out.println("Sending chunk");
         //forward chunk to a peers
-        net.sendDataToPeer(buffer, tableName, "/api/chunk", MediaType.APPLICATION_JSON);
+        net.sendDataToPeer(buffer, tableName, "/chunk", MediaType.APPLICATION_JSON);
         //vider le buffer
         buffer.delete(0, buffer.length());
     }
@@ -39,7 +40,8 @@ public class InsertDataEndpoint {
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
         StringBuffer bufferToSend = new StringBuffer();
         String line;
-        int NB_PEERS = net.getNumberOfPeers();
+        int NB_PEERS = net.getNumberOfPeers() + 1;
+        System.out.println(NB_PEERS);
         int countLine = 0;
         int peers = 0;
         while ((line = buffer.readLine()) != null) {
@@ -62,12 +64,14 @@ public class InsertDataEndpoint {
                     countLine++;
                 } else {
                     //on envoie à un des peers
+                    System.out.println("Chunk rempli");
                     sendChunk(bufferToSend, tableName);
                     countLine = 1;
                     peers++;
                 }
             }
         }
+        System.out.println("last chunk");
         sendChunk(bufferToSend, tableName);
         inputStream.close();
         buffer.close();
@@ -89,7 +93,7 @@ public class InsertDataEndpoint {
         List<InputPart> inputParts = uploadForm.get(UPLOADED_FILE_PARAMETER_NAME);
 
         for (InputPart inputPart : inputParts) {
-            parseCSV(inputPart, TABLE_NAME);
+            parseCSV(inputPart, tableName);
         }
         nameInputStream.close();
         return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!\n").build();
