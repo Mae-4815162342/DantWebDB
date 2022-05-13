@@ -41,9 +41,9 @@ public class InsertDataEndpoint {
         StringBuffer bufferToSend = new StringBuffer();
         String line;
         int NB_PEERS = net.getNumberOfPeers() + 1;
-        System.out.println(NB_PEERS);
         int countLine = 0;
         int peers = 0;
+        int bufferPointer = 0;
         while ((line = buffer.readLine()) != null) {
             if (peers % NB_PEERS == 0) {
                 // on stock dans la machine actuelle
@@ -59,13 +59,22 @@ public class InsertDataEndpoint {
                     countLine = 1;
                 }
             } else {
+
                 bufferToSend.append(line + "\n");
                 if (countLine < CHUNK_SIZE) {
                     countLine++;
                 } else {
                     //on envoie à un des peers
                     System.out.println("Chunk rempli");
-                    sendChunk(bufferToSend, tableName);
+                    Thread sendPeer = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (bufferToSend){
+                                sendChunk(bufferToSend, tableName);
+                            }
+                        }
+                    });
+                    sendPeer.start();
                     countLine = 1;
                     peers++;
                 }
