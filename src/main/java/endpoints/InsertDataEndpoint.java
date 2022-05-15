@@ -1,6 +1,5 @@
 package endpoints;
 
-import com.sun.mail.iap.ByteArray;
 import controller.Worker;
 import exception.TableNotExistsException;
 import network.Network;
@@ -16,72 +15,77 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Path("/api")
 public class InsertDataEndpoint {
-    private static final int CHUNK_SIZE = 100_000;
+    private static final int CHUNK_SIZE = 100;
     private final Network net = Network.getInstance();
 
-    public void sendChunk(StringBuffer buffer, String tableName) {
+    public void sendChunk(ArrayList<String> buffer, String tableName) {
         System.out.println("Sending chunk");
         //forward chunk to a peers
         net.sendDataToPeer(buffer, tableName, "/chunk", MediaType.APPLICATION_JSON);
-        //vider le buffer
-        buffer.delete(0, buffer.length());
     }
 
+    /* idea:
+     * - multiple producer that adds lines in the queue
+     * - mutliple consumers thats takes out lines
+     *       --> if the consumer has X lines it send a chunk to next peer
+     * */
     public void parseCSV(InputPart inputPart, String tableName) throws IOException {
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuffer bufferToSend = new StringBuffer();
-        String line;
-        int NB_PEERS = net.getNumberOfPeers() + 1;
-        int countLine = 0;
-        int peers = 0;
-        int bufferPointer = 0;
-        while ((line = buffer.readLine()) != null) {
-            if (peers % NB_PEERS == 0) {
-                // on stock dans la machine actuelle
-                try {
-                    ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
-                    Worker.getInstance().insertIntoTable(tableName, entry);
-                } catch (TableNotExistsException e) {
-                    e.printStackTrace();
-                }
-                countLine++;
-                if (countLine >= CHUNK_SIZE) {
-                    peers++;
-                    countLine = 1;
-                }
-            } else {
 
-                bufferToSend.append(line + "\n");
-                if (countLine < CHUNK_SIZE) {
-                    countLine++;
-                } else {
-                    //on envoie à un des peers
-                    System.out.println("Chunk rempli");
-                    Thread sendPeer = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            synchronized (bufferToSend){
-                                sendChunk(bufferToSend, tableName);
-                            }
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
+
+        int NB_PEERS = net.getNumberOfPeers() + 1;
+        AtomicInteger nextPeer = new AtomicInteger();
+
+        /* PRODUCER */
+        buffer.lines()
+                .parallel()
+                .forEach(line -> {
+                    if (nextPeer.get() % NB_PEERS == 0 && queue.size() > CHUNK_SIZE) {
+                        // on stock dans la machine actuelle
+                        try {
+                            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+                            Worker.getInstance().insertIntoTable(tableName, entry);
+                        } catch (TableNotExistsException e) {
+                            e.printStackTrace();
                         }
-                    });
-                    sendPeer.start();
-                    countLine = 1;
-                    peers++;
+
+                        nextPeer.getAndIncrement();
+                    }
+
+                    /* on ajoute une ligne à la queue */
+                    queue.offer(line + "\n");
+                });
+
+        /* CONSUMERS */
+        Callable<Integer> pollTask = () -> {
+            ArrayList<String> chunk = new ArrayList<>();
+            while (!queue.isEmpty()) {
+                while (chunk.size() < CHUNK_SIZE) {
+                    chunk.add(queue.poll());
                 }
+                // forward chunk to next peer
+                nextPeer.getAndIncrement();
+                System.out.println("Sending to next peer : " + nextPeer.get());
+                sendChunk(chunk, tableName);
             }
-        }
-        System.out.println("last chunk");
-        sendChunk(bufferToSend, tableName);
+            return null;
+        };
+
+        executorService.submit(pollTask);
+
         inputStream.close();
         buffer.close();
     }

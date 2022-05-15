@@ -129,7 +129,7 @@ public class Network {
         }
     }
 
-    public Response sendDataToPeer(StringBuffer buffer, String tableName, String path, String mediaType) {
+    public Response sendDataToPeer(ArrayList<String> buffer, String tableName, String path, String mediaType) {
 
         ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
         try {
