@@ -1,7 +1,5 @@
 package controller;
 
-import exception.ColumnNotExistsException;
-import exception.InvalidSelectRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 import model.Database;
@@ -27,15 +25,19 @@ public class Worker {
     }
 
     public static void createTable(String name, LinkedHashMap<String, String> columns) throws TableExistsException {
-        database.addTable(name,columns);
+        database.addTable(name, columns);
     }
 
     public static Table getTableByName(String name) throws TableNotExistsException {
         return database.getTableByName(name);
     }
 
-    public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
+    public void insertIntoTable(String tableName, String entry) throws TableNotExistsException {
         database.insertIntoTable(tableName, entry);
+    }
+
+    public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {
+        database.insertChunkIntoTable(tableName, entries);
     }
 
     public Object select(String jsonStr, String type, String table) throws Exception {

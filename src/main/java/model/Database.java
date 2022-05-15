@@ -1,13 +1,8 @@
 package model;
-import exception.ColumnNotExistsException;
-import exception.InvalidSelectRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.google.gson.Gson;
 
@@ -69,12 +64,13 @@ public class Database {
         }
     }
 
-    public void insertIntoTable(String tableName, ArrayList<String> entry) throws TableNotExistsException {
+    public void insertIntoTable(String tableName, String entry) throws TableNotExistsException {
         /* test if the table is in the database */
         Table table = getTableByName(tableName);
-        if(table != null) {
+        if (table != null) {
+            ArrayList<String> row = new ArrayList<>(Arrays.asList(entry.split(",")));
             /* the entry can be added to the table */
-            table.insertEntry(entry);
+            table.insertEntry(row);
         }
     }
 
@@ -101,6 +97,18 @@ public class Database {
             return res;
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {
+        /* test if the table is in the database */
+        Table table = getTableByName(tableName);
+        if (table != null) {
+            for (String line : entries) {
+                ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+                /* the entry can be added to the table */
+                table.insertEntry(entry);
+            }
         }
     }
 }

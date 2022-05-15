@@ -16,16 +16,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Path("/api")
 public class InsertDataEndpoint {
-    private static final int CHUNK_SIZE = 100;
+    private static final int CHUNK_SIZE = 1000;
     private final Network net = Network.getInstance();
 
     public void sendChunk(ArrayList<String> buffer, String tableName) {
@@ -43,55 +40,63 @@ public class InsertDataEndpoint {
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newCachedThreadPool();
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
+        AtomicInteger NB_LINES = new AtomicInteger();
 
-        int NB_PEERS = net.getNumberOfPeers() + 1;
-        AtomicInteger nextPeer = new AtomicInteger();
-
-        /* PRODUCER */
-        buffer.lines()
-                .parallel()
-                .forEach(line -> {
-                    if (nextPeer.get() % NB_PEERS == 0 && queue.size() > CHUNK_SIZE) {
-                        // on stock dans la machine actuelle
-                        try {
-                            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
-                            Worker.getInstance().insertIntoTable(tableName, entry);
-                        } catch (TableNotExistsException e) {
-                            e.printStackTrace();
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            /* PRODUCER */
+            buffer.lines()
+                    .parallel()
+                    .forEach(line -> {
+                        if (NB_LINES.getAndIncrement() % 1000 == 0) {
+                            System.out.println(NB_LINES + " lines inserted");
                         }
+                        /* on ajoute une ligne à la queue */
+                        queue.offer(line + "\n");
+                    });
+        });
 
-                        nextPeer.getAndIncrement();
+        try {
+//            executorService.execute(producerTask);
+            /* CONSUMERS */
+            Callable<Integer> pollTask = () -> {
+                System.out.println("poll task created");
+                ArrayList<String> chunk = new ArrayList<>();
+                while (!queue.isEmpty()) {
+                    while (chunk.size() < CHUNK_SIZE) {
+                        chunk.add(queue.poll());
                     }
+                    // forward chunk to next peer
+//                nextPeer.getAndIncrement();
+//                System.out.println("Sending to next peer : " + nextPeer.get());
+//                sendChunk(chunk, tableName);
+                    try {
+                        Worker.getInstance().insertChunkIntoTable(tableName, chunk);
+                        System.out.println(chunk.size() + " lines inserted !");
 
-                    /* on ajoute une ligne à la queue */
-                    queue.offer(line + "\n");
-                });
-
-        /* CONSUMERS */
-        Callable<Integer> pollTask = () -> {
-            ArrayList<String> chunk = new ArrayList<>();
-            while (!queue.isEmpty()) {
-                while (chunk.size() < CHUNK_SIZE) {
-                    chunk.add(queue.poll());
+                    } catch (TableNotExistsException e) {
+                        e.printStackTrace();
+                    }
                 }
-                // forward chunk to next peer
-                nextPeer.getAndIncrement();
-                System.out.println("Sending to next peer : " + nextPeer.get());
-                sendChunk(chunk, tableName);
+                return null;
+            };
+            executorService.submit(pollTask);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            executorService.shutdown();
+            while (!future.isDone()) {
+                System.out.println("waiting for stream to finish");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-            if (!chunk.isEmpty()) {
-                System.out.println("Sending to next peer : " + nextPeer.get());
-                sendChunk(chunk, tableName);
-            }
-            return null;
-        };
-
-        executorService.submit(pollTask);
-
-        inputStream.close();
-        buffer.close();
+            inputStream.close();
+            buffer.close();
+        }
     }
 
     @POST
@@ -119,17 +124,12 @@ public class InsertDataEndpoint {
 
     @POST
     @Path("/chunk")
-    public Response insertInto(StringBuffer chunk, @QueryParam("tableName") String tableName) {
+    public Response insertInto(ArrayList<String> chunk, @QueryParam("tableName") String tableName) {
         /* INSERT INTO TABLE THE DATA*/
-        String[] lines = chunk.toString().split("\n");
-        for (String line : lines) {
-            ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
-
-            try {
-                Worker.getInstance().insertIntoTable(tableName, entry);
-            } catch (TableNotExistsException e) {
-                return Response.status(400).entity(e.getMessage() + "\n If you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
-            }
+        try {
+            Worker.getInstance().insertChunkIntoTable(tableName, chunk);
+        } catch (TableNotExistsException e) {
+            return Response.status(400).entity(e.getMessage() + "\n If you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
         }
         return Response.ok("Values inserted into " + tableName + "!\n").build();
     }
