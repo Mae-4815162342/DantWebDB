@@ -10,4 +10,4 @@
 ## Directory-based project format:
 /.idea
 /target
-/src/main/java/machine_information.txt
+/src/main/.DS_Store
