@@ -81,6 +81,10 @@ public class InsertDataEndpoint {
                 System.out.println("Sending to next peer : " + nextPeer.get());
                 sendChunk(chunk, tableName);
             }
+            if (!chunk.isEmpty()) {
+                System.out.println("Sending to next peer : " + nextPeer.get());
+                sendChunk(chunk, tableName);
+            }
             return null;
         };
 
