@@ -39,21 +39,18 @@ public class InsertDataEndpoint {
     public void parseCSV(InputPart inputPart, String tableName) throws IOException {
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        int NB_PEERS = Network.getInstance().getNumberOfPeers();
+        ExecutorService executorService = Executors.newFixedThreadPool(NB_PEERS);
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
         AtomicInteger NB_LINES = new AtomicInteger();
 
         Runnable offerTask = () -> {
             /* PRODUCER */
             try {
-                int NB_PEERS = Network.getInstance().getNumberOfPeers() + 1;
-                int i = 0;
+                int i = 1;
                 String line;
                 while ((line = buffer.readLine()) != null) {
-                    if (NB_LINES.getAndIncrement() % 200_000 == 0) {
-                        System.out.println(NB_LINES + " lines inserted");
-                    }
+                    i++;
                     // on insert la ligne en local
                     if (i % NB_PEERS == 0) {
                         Worker.getInstance().insertIntoTable(tableName, line);
@@ -62,13 +59,11 @@ public class InsertDataEndpoint {
                     else {
                         queue.offer(line + "\n");
                     }
-                    i++;
                 }
             }
             catch(Exception e){
                 e.printStackTrace();
             }
-
         };
         System.out.println("Submitting offer task...");
 
