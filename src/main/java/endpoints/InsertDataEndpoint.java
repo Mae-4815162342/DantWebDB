@@ -44,7 +44,6 @@ public class InsertDataEndpoint {
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
         AtomicInteger NB_LINES = new AtomicInteger();
 
-        ArrayList<String> localChunk = new ArrayList<String>();
         Runnable offerTask = () -> {
             /* PRODUCER */
             try {
@@ -57,18 +56,13 @@ public class InsertDataEndpoint {
                     }
                     // on insert la ligne en local
                     if (i % NB_PEERS == 0) {
-                        localChunk.add(line);
+                        Worker.getInstance().insertIntoTable(tableName, line);
                     }
                     // on ajoute une ligne à la queue
                     else {
                         queue.offer(line + "\n");
                     }
                     i++;
-                    if (localChunk.size() >= CHUNK_SIZE) {
-                        System.out.println("Inserting chunk in local server");
-                        Worker.getInstance().insertChunkIntoTable(tableName, localChunk);
-                        localChunk.clear();
-                    }
                 }
             }
             catch(Exception e){
