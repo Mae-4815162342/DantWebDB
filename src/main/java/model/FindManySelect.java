@@ -41,21 +41,23 @@ public class FindManySelect implements SelectInterface{
       ArrayList<String> values = row.getColumnValuesMap();
       HashMap<String, String> resulatRow = new HashMap<String, String>();
       boolean valid = true;
-      for(String targetColumn : selectedLabels){
-        int index = columnLabel.indexOf(targetColumn);
-        if(index >= 0) {
-          if(where.get(targetColumn) == null) {
-            //en cas de group by il ne faut pas ajouter la valeur dans le row
-            if(!targetColumn.equals(groupBy)) resulatRow.put(targetColumn, values.get(index));
-          } else {
-            if (!where.get(targetColumn).equals(values.get(index))) {
-              valid = false;
-            } else {
+      if(where!=null){
+        for(String targetColumn : selectedLabels){
+          int index = columnLabel.indexOf(targetColumn);
+          if(index >= 0) {
+            if(where.get(targetColumn) == null) {
               //en cas de group by il ne faut pas ajouter la valeur dans le row
               if(!targetColumn.equals(groupBy)) resulatRow.put(targetColumn, values.get(index));
+            } else {
+              if (!where.get(targetColumn).equals(values.get(index))) {
+                valid = false;
+              } else {
+                //en cas de group by il ne faut pas ajouter la valeur dans le row
+                if(!targetColumn.equals(groupBy)) resulatRow.put(targetColumn, values.get(index));
+              }
             }
           }
-        }
+        }  
       }
       if(valid){
         if(hasGroupBy) {
