@@ -12,4 +12,4 @@
 /target
 /src/main/.DS_Store
 
-src/main/java/machine_information.txt
+/src/main/java/machine_information.txt
