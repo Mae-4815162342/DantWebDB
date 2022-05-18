@@ -40,20 +40,35 @@ public class InsertDataEndpoint {
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
         AtomicInteger NB_LINES = new AtomicInteger();
 
+        ArrayList<String> localChunk = new ArrayList<String>();
         Runnable offerTask = () -> {
             /* PRODUCER */
-            try{
+            try {
+                int NB_PEERS = Network.getInstance().getNumberOfPeers() + 1;
+                int i = 0;
                 String line;
-                while((line = buffer.readLine()) != null){
+                while ((line = buffer.readLine()) != null) {
                     if (NB_LINES.getAndIncrement() % 200_000 == 0) {
                         System.out.println(NB_LINES + " lines inserted");
                     }
-                    /* on ajoute une ligne à la queue */
-                    queue.offer(line + "\n");
+                    // on insert la ligne en local
+                    if (i % NB_PEERS == 0) {
+                        localChunk.add(line);
+                    }
+                    // on ajoute une ligne à la queue
+                    else {
+                        queue.offer(line + "\n");
+                    }
+                    i++;
+                    if (localChunk.size() >= CHUNK_SIZE) {
+                        System.out.println("Inserting chunk in local server");
+                        Worker.getInstance().insertChunkIntoTable(tableName, localChunk);
+                        localChunk.clear();
+                    }
                 }
             }
             catch(Exception e){
@@ -80,6 +95,8 @@ public class InsertDataEndpoint {
                 sendChunk(chunk, tableName);
                 chunk.clear();
             }
+            sendChunk(chunk, tableName);
+            chunk.clear();
             return null;
         };
 
@@ -89,10 +106,10 @@ public class InsertDataEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            while (!executorService.isTerminated()) {
-                System.out.println("waiting for stream to finish");
+            while (!queue.isEmpty()) {
+                System.out.println("waiting for insert to finish");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -107,10 +124,12 @@ public class InsertDataEndpoint {
     @Consumes("multipart/form-data")
     @Path("/upload")
     public Response uploadFile(@GZIP MultipartFormDataInput input) throws IOException {
+        System.out.println("Receive request on /upload");
         final String UPLOADED_FILE_PARAMETER_NAME = "file";
         final String TABLE_NAME = "tableName";
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 
+        System.out.println("Creating stream");
         List<InputPart> tableNameInput = uploadForm.get(TABLE_NAME);
         InputStream nameInputStream = tableNameInput.get(0).getBody(InputStream.class, null);
         String tableName = new String(IOUtils.toByteArray(nameInputStream));
