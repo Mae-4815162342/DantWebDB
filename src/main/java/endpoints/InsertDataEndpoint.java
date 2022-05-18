@@ -49,7 +49,7 @@ public class InsertDataEndpoint {
             buffer.lines()
                     .parallel()
                     .forEach(line -> {
-                        if (NB_LINES.getAndIncrement() % 1000 == 0) {
+                        if (NB_LINES.getAndIncrement() % 200_000 == 0) {
                             System.out.println(NB_LINES + " lines inserted");
                         }
                         /* on ajoute une ligne à la queue */
@@ -58,7 +58,6 @@ public class InsertDataEndpoint {
         });
 
         try {
-//            executorService.execute(producerTask);
             /* CONSUMERS */
             Callable<Integer> pollTask = () -> {
                 System.out.println("poll task created");
@@ -68,24 +67,15 @@ public class InsertDataEndpoint {
                         chunk.add(queue.poll());
                     }
                     // forward chunk to next peer
-//                nextPeer.getAndIncrement();
-//                System.out.println("Sending to next peer : " + nextPeer.get());
-//                sendChunk(chunk, tableName);
-                    try {
-                        Worker.getInstance().insertChunkIntoTable(tableName, chunk);
-                        System.out.println(chunk.size() + " lines inserted !");
-
-                    } catch (TableNotExistsException e) {
-                        e.printStackTrace();
-                    }
+                    sendChunk(chunk, tableName);
                 }
                 return null;
             };
+
             executorService.submit(pollTask);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            executorService.shutdown();
             while (!future.isDone()) {
                 System.out.println("waiting for stream to finish");
                 try {
@@ -94,6 +84,7 @@ public class InsertDataEndpoint {
                     e.printStackTrace();
                 }
             }
+            executorService.shutdown();
             inputStream.close();
             buffer.close();
         }

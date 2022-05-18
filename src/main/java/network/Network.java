@@ -17,6 +17,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Network {
 
@@ -25,7 +26,7 @@ public class Network {
     private static Network instance;
     private ResteasyClient client;
     private static String baseURI = "http://{ipAddress}:8080/api";
-    private static int nextPeer = 0;
+    private static AtomicInteger nextPeer = new AtomicInteger();
 
     private Network() {
         this.ipAdress = getIpAddress();
@@ -122,10 +123,10 @@ public class Network {
     }
 
     private void goToNextPeer() {
-        if (nextPeer % getNumberOfPeers() == 0) {
-            nextPeer = 0;
+        if (nextPeer.get() % getNumberOfPeers() != 0) {
+            nextPeer.getAndIncrement();
         } else {
-            nextPeer++;
+            nextPeer.set(0);
         }
     }
 
@@ -133,7 +134,7 @@ public class Network {
 
         ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
         try {
-            String ipAddress = peersIPAdressesList.get(nextPeer);
+            String ipAddress = peersIPAdressesList.get(nextPeer.get());
             goToNextPeer();
             System.out.println("• Sending data request to " + ipAddress);
 
