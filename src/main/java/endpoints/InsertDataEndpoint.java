@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Path("/api")
 public class InsertDataEndpoint {
-    private static final int CHUNK_SIZE = 1000;
+    private static final int CHUNK_SIZE = 100_000;
     private final Network net = Network.getInstance();
 
     public void sendChunk(ArrayList<String> buffer, String tableName) {
@@ -56,27 +56,31 @@ public class InsertDataEndpoint {
                         queue.offer(line + "\n");
                     });
         });
+        while (queue.isEmpty()) {
+            System.out.println("Waiting for queue to have line");
+        }
+
+        /* CONSUMERS */
+        Callable<Integer> pollTask = () -> {
+            System.out.println("poll task created");
+            ArrayList<String> chunk = new ArrayList<>();
+            while (!queue.isEmpty()) {
+                while (chunk.size() < CHUNK_SIZE) {
+                    chunk.add(queue.poll());
+                }
+                // forward chunk to next peer
+                sendChunk(chunk, tableName);
+                chunk.clear();
+            }
+            return null;
+        };
 
         try {
-            /* CONSUMERS */
-            Callable<Integer> pollTask = () -> {
-                System.out.println("poll task created");
-                ArrayList<String> chunk = new ArrayList<>();
-                while (!queue.isEmpty()) {
-                    while (chunk.size() < CHUNK_SIZE) {
-                        chunk.add(queue.poll());
-                    }
-                    // forward chunk to next peer
-                    sendChunk(chunk, tableName);
-                }
-                return null;
-            };
-
             executorService.submit(pollTask);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            while (!future.isDone()) {
+            while (!future.isDone() && !executorService.isTerminated()) {
                 System.out.println("waiting for stream to finish");
                 try {
                     Thread.sleep(1000);
@@ -84,7 +88,6 @@ public class InsertDataEndpoint {
                     e.printStackTrace();
                 }
             }
-            executorService.shutdown();
             inputStream.close();
             buffer.close();
         }
@@ -118,6 +121,7 @@ public class InsertDataEndpoint {
     public Response insertInto(ArrayList<String> chunk, @QueryParam("tableName") String tableName) {
         /* INSERT INTO TABLE THE DATA*/
         try {
+            System.out.println("Received a chunk to insert into + " + tableName);
             Worker.getInstance().insertChunkIntoTable(tableName, chunk);
         } catch (TableNotExistsException e) {
             return Response.status(400).entity(e.getMessage() + "\n If you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
