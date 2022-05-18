@@ -44,18 +44,26 @@ public class InsertDataEndpoint {
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
         AtomicInteger NB_LINES = new AtomicInteger();
 
-        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+        Runnable offerTask = () -> {
             /* PRODUCER */
-            buffer.lines()
-                    .parallel()
-                    .forEach(line -> {
-                        if (NB_LINES.getAndIncrement() % 200_000 == 0) {
-                            System.out.println(NB_LINES + " lines inserted");
-                        }
-                        /* on ajoute une ligne à la queue */
-                        queue.offer(line + "\n");
-                    });
-        });
+            try{
+                String line;
+                while((line = buffer.readLine()) != null){
+                    if (NB_LINES.getAndIncrement() % 200_000 == 0) {
+                        System.out.println(NB_LINES + " lines inserted");
+                    }
+                    /* on ajoute une ligne à la queue */
+                    queue.offer(line + "\n");
+                }
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+        };
+        System.out.println("Submitting offer task...");
+
+        executorService.submit(offerTask);
         while (queue.isEmpty()) {
             System.out.println("Waiting for queue to have line");
         }
@@ -76,11 +84,12 @@ public class InsertDataEndpoint {
         };
 
         try {
+            System.out.println("Submitting poll task...");
             executorService.submit(pollTask);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            while (!future.isDone() && !executorService.isTerminated()) {
+            while (!executorService.isTerminated()) {
                 System.out.println("waiting for stream to finish");
                 try {
                     Thread.sleep(1000);
@@ -109,6 +118,7 @@ public class InsertDataEndpoint {
         List<InputPart> inputParts = uploadForm.get(UPLOADED_FILE_PARAMETER_NAME);
 
         for (InputPart inputPart : inputParts) {
+            System.out.println("Parsing CSV");
             parseCSV(inputPart, tableName);
         }
         nameInputStream.close();
