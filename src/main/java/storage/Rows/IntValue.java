@@ -1,9 +1,16 @@
 package storage.Rows;
 
-import storage.Rows.Type;
+import java.util.ArrayList;
 
 public class IntValue implements Type<Integer> {
     private Integer value;
+    private IntValue fils1;
+    private IntValue fils2;
+    private ArrayList<RowObject> rows=new ArrayList<>();
+
+    public IntValue(String v){
+        this.value=Integer.parseInt(v);
+    }
 
     @Override
     public Integer getValue() {
