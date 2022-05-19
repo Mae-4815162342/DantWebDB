@@ -44,7 +44,10 @@ public class InsertDataEndpoint {
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
         AtomicInteger NB_LINES = new AtomicInteger();
 
-        Runnable offerTask = () -> {
+        System.out.println("Running async offer task...");
+
+        /* offer task */
+        CompletableFuture.runAsync(() -> {
             /* PRODUCER */
             try {
                 int i = 1;
@@ -60,14 +63,11 @@ public class InsertDataEndpoint {
                         queue.offer(line + "\n");
                     }
                 }
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        };
-        System.out.println("Submitting offer task...");
+        });
 
-        executorService.submit(offerTask);
         while (queue.isEmpty()) {
             System.out.println("Waiting for queue to have line");
         }
@@ -141,7 +141,8 @@ public class InsertDataEndpoint {
         try {
             System.out.println("Received a chunk to insert into + " + tableName);
             Worker.getInstance().insertChunkIntoTable(tableName, chunk);
-        } catch (TableNotExistsException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(400).entity(e.getMessage() + "\n If you meant to create it, you need to call /api/createTable\n").type("plain/text").build();
         }
         return Response.ok("Values inserted into " + tableName + "!\n").build();
