@@ -55,7 +55,7 @@ public class InsertDataEndpoint {
                 while ((line = buffer.readLine()) != null) {
                     i++;
                     // on insert la ligne en local
-                    if (i % NB_PEERS == 0) {
+                    if (i % (NB_PEERS + 1) == 0) {
                         Worker.getInstance().insertIntoTable(tableName, line);
                     }
                     // on ajoute une ligne à la queue
