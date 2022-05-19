@@ -145,7 +145,7 @@ public class Network {
                     .request()
                     .post(Entity.entity(buffer, mediaType));
 
-            System.out.println("--> Status code :" + response.getStatus());
+            System.out.println("--> Status code :" + response.readEntity(String.class));
             response.close();
         } catch (Exception e) {
             return Response.ok(e.getMessage()).build();
