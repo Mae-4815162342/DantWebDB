@@ -77,7 +77,7 @@ public class InsertDataEndpoint {
             System.out.println("poll task created");
             ArrayList<String> chunk = new ArrayList<>();
             while (!queue.isEmpty()) {
-                while (chunk.size() < CHUNK_SIZE) {
+                while (chunk.size() < CHUNK_SIZE && !queue.isEmpty()) {
                     chunk.add(queue.poll());
                 }
                 // forward chunk to next peer
