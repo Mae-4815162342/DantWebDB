@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface Storage<T>{
 
-    void insert(T... line);
+    void insert(T line);
 
     void insert(List<T> lines);
 
