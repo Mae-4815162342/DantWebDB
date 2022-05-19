@@ -123,7 +123,7 @@ public class Network {
     }
 
     private void goToNextPeer() {
-        if (nextPeer.get() % getNumberOfPeers() != 0) {
+        if (nextPeer.get() != getNumberOfPeers()) {
             nextPeer.getAndIncrement();
         } else {
             nextPeer.set(0);
