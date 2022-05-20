@@ -2,6 +2,7 @@ package endpoints;
 
 import controller.Worker;
 import exception.TableNotExistsException;
+import model.Table;
 import network.Network;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.annotations.GZIP;
@@ -18,6 +19,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 
 @Path("/api")
@@ -36,59 +38,52 @@ public class InsertDataEndpoint {
      * - mutliple consumers thats takes out lines
      *       --> if the consumer has X lines it send a chunk to next peer
      * */
-    public void parseCSV(InputPart inputPart, String tableName) throws IOException {
+    public void parseCSV(InputPart inputPart, String tableName) throws IOException, TableNotExistsException, InterruptedException {
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
         int NB_PEERS = Network.getInstance().getNumberOfPeers();
-        ExecutorService executorService = Executors.newFixedThreadPool(NB_PEERS);
+        System.out.println("NB_PEERS : " + NB_PEERS);
+        ExecutorService executorService = Executors.newFixedThreadPool(NB_PEERS + 1);
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
-        AtomicInteger NB_LINES = new AtomicInteger();
-
+		AtomicInteger NB_LINES = new AtomicInteger();
+        Table table = Worker.getInstance().getTableByName(tableName);
         System.out.println("Running async offer task...");
-
+        buffer.readLine();
+        buffer.readLine();
         /* offer task */
-        CompletableFuture.runAsync(() -> {
-            /* PRODUCER */
-            try {
-                int i = 1;
-                String line;
-                while ((line = buffer.readLine()) != null) {
-                    i++;
-                    // on insert la ligne en local
-                    if (i % (NB_PEERS + 1) == 0) {
-                        Worker.getInstance().insertIntoTable(tableName, line);
-                    }
-                    // on ajoute une ligne à la queue
-                    else {
-                        queue.offer(line + "\n");
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        /* PRODUCER */
+        try {
+            String line;
+            while ((line = buffer.readLine()) != null) {
+                queue.offer(line);
             }
-        });
-
-        while (queue.isEmpty()) {
-            System.out.println("Waiting for queue to have line");
+            System.out.println("FINITO");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         /* CONSUMERS */
         Callable<Integer> pollTask = () -> {
-            System.out.println("poll task created");
             ArrayList<String> chunk = new ArrayList<>();
             while (!queue.isEmpty()) {
-                while (chunk.size() < CHUNK_SIZE && !queue.isEmpty()) {
+                while (chunk.size() < CHUNK_SIZE) {
                     chunk.add(queue.poll());
                 }
                 // forward chunk to next peer
                 sendChunk(chunk, tableName);
                 chunk.clear();
             }
-            sendChunk(chunk, tableName);
-            chunk.clear();
+            if(chunk.size() >0){
+                sendChunk(chunk, tableName);
+                chunk.clear();  
+            }
             return null;
         };
-
+        Collection<Callable<Integer>> callables = new ArrayList<>();
+        IntStream.rangeClosed(0, NB_PEERS).forEach(i-> {
+            callables.add(pollTask);
+        });
+        executorService.invokeAll(callables);
         try {
             System.out.println("Submitting poll task...");
             executorService.submit(pollTask);
@@ -96,13 +91,9 @@ public class InsertDataEndpoint {
             e.printStackTrace();
         } finally {
             while (!queue.isEmpty()) {
-                System.out.println("waiting for insert to finish");
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                
             }
+            executorService.shutdown();
             inputStream.close();
             buffer.close();
         }
@@ -112,7 +103,7 @@ public class InsertDataEndpoint {
     @GZIP
     @Consumes("multipart/form-data")
     @Path("/upload")
-    public Response uploadFile(@GZIP MultipartFormDataInput input) throws IOException {
+    public Response uploadFile(@GZIP MultipartFormDataInput input) throws IOException, TableNotExistsException, InterruptedException {
         System.out.println("Receive request on /upload");
         final String UPLOADED_FILE_PARAMETER_NAME = "file";
         final String TABLE_NAME = "tableName";
