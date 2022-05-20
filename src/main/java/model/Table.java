@@ -1,36 +1,53 @@
 package model;
 import storage.RowStorage;
-import storage.Rows.RowObject;
-import storage.Rows.RowObjectStorage;
-import storage.Rows.Type;
+import storage.Rows.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class Table {
     private String tableName;
-    private HashMap<String,Type> headers=new HashMap<>();
+    private LinkedHashMap<String, Tree> headers=new LinkedHashMap<>();
     private final RowObjectStorage lines;
-    private ArrayList<String> columnName=new ArrayList<>();
     private ArrayList<Class> types=new ArrayList<>();
+    private int nb;
+
 
 
 
     public Table(String tableName, LinkedHashMap<String, String> columns) {
         this.tableName = tableName;
         this.lines = new RowObjectStorage();
-        this.columns = columns;
+        this.nb=0;
+        //this.columns = columns;
+        Set<String> keys = columns.keySet();
 
+        // printing the elements of LinkedHashMap
+        for (String key : keys) {
+            String v=columns.get(key);
+            System.out.println(key + " -- " + v);
+            switch (v) {
+                case "int":
+                    headers.put(v, new IntTree());
+                    types.add(Integer.class);
+                case "string":
+                    headers.put(v, new IntTree());
+                    types.add(Integer.class);
+
+            }
+        }
     }
+
+
     public void insertEntry(String line) {
+        String[] tab=line.split(",");
+        
         RowObject row =  new RowObject(null);
         lines.insert(row);
     }
 
-    public LinkedHashMap<String, String> getColumns() {
+   /* public LinkedHashMap<String, String> getColumns() {
         return columns;
-    }
+    }*/
 
     public RowObjectStorage getLines() {
         return lines;
