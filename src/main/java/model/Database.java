@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 
 public class Database {
     private final HashMap<String, Table> tables;
-    private final Gson gson = new Gson();
 
     public Database() {
         this.tables = new HashMap<>();
@@ -79,25 +78,16 @@ public class Database {
         return table.getColumns();
     }
 
-    public Object select(String jsonStr, String type, String tableName) throws Exception {
-        Table table = this.getTableByName(tableName);
-        SelectInterface select;
-        switch(type){
-            case "findUnique":
-                select = gson.fromJson(jsonStr, FindUniqueSelect.class);
-                break;
-            case "findMany":
-                select = gson.fromJson(jsonStr, FindManySelect.class);
-                break;
-            default:
-                return null;
-        }
+
+    public Object select(SelectInterface request, String tableName) throws Exception {
+        Table table = getTableByName(tableName);
+        Object res = null;
         try {
-            Object res = select.run(table);
-            return res;
+            res = request.run(table);
         } catch (Exception e) {
             throw e;
         }
+        return res;
     }
 
     public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {

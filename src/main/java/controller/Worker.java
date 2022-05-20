@@ -1,10 +1,12 @@
 package controller;
 
+import exception.ColumnNotExistsException;
+import exception.InvalidSelectRequestException;
+import com.google.gson.Gson;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
-import model.Database;
-import model.Table;
-
+import exception.UnknownTypeOfSelect;
+import model.*;
 import java.util.ArrayList;
 // methodes recu par les endpoints create table, insert into table, ...
 import java.util.LinkedHashMap;
@@ -12,6 +14,9 @@ import java.util.LinkedHashMap;
 public class Worker {
     private static Database database;
     private static Worker instance;
+    private final Gson gson = new Gson();
+    private SelectInterface currentSelect;
+    private volatile ArrayList<Object> reqRes;
 
     public Worker(){
         database = new Database();
@@ -40,11 +45,56 @@ public class Worker {
         database.insertChunkIntoTable(tableName, entries);
     }
 
-    public Object select(String jsonStr, String type, String table) throws Exception {
-        return database.select(jsonStr, type, table);
-    }
-
     public Object getColumns(String table) throws Exception {
         return database.getColumns(table);
     }
+
+    public Object select(String tableName) throws Exception {
+        if(this.currentSelect == null ) {
+            throw new InvalidSelectRequestException();
+        }
+        return database.select(currentSelect, tableName);
+    }
+
+    public void setRequest(String jsonStr, String type, String tableName) throws Exception {
+        database.getTableByName(tableName);
+        switch(type){
+            case "findUnique":
+                currentSelect = gson.fromJson(jsonStr, FindUniqueSelect.class);
+                break;
+            case "findMany":
+                currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
+                break;
+            default:
+                throw new UnknownTypeOfSelect(type);
+        }
+    }
+
+    public Boolean reqHasSelect() {
+        return currentSelect != null && currentSelect.hasSelect();
+    }
+
+    public Boolean reqHasWhere() {
+        return currentSelect != null && currentSelect.hasWhere();
+    }
+
+    public Boolean reqHasGroupBy() {
+        return currentSelect != null && currentSelect.hasGroupBy();
+    }
+
+    public int reqLimit() {
+        return currentSelect != null ? currentSelect.getLimit() : -1;
+    }
+
+    public void addLinesToAnswer(Object lines) {
+        if (reqRes == null) {
+            reqRes = new ArrayList<>();
+        }
+        reqRes.add(lines);
+    }
+
+    public Object getRes() {
+        return reqRes;
+    }
+
 }
