@@ -132,7 +132,8 @@ public class Network {
 
         ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
         try {
-            String ipAddress = peersIPAdressesList.get(goToNextPeer());
+            String ipAddress = peersIPAdressesList.get(nextPeer.get());
+            goToNextPeer();
             System.out.println("• Sending data request to " + ipAddress);
 
             Response response = target
@@ -141,13 +142,36 @@ public class Network {
                     .queryParam("tableName", tableName)
                     .request()
                     .post(Entity.entity(buffer, mediaType));
-
-            System.out.println("--> Status code :" + response.readEntity(String.class));
+            System.out.println("--> Status code :" + response.getStatus());
             response.close();
         } catch (Exception e) {
             return Response.ok(e.getMessage()).build();
         }
         return Response.ok("Data successfully inserted into " + tableName + " to a peer").build();
+    }
 
+
+    public String getIpAdressFromIndex(int i) {
+        return peersIPAdressesList.get(i);
+    }
+
+    public Object sendSelectToPeer(String ipAddress,String json, String tableName, String selectType, String path, String mediaType) {
+        goToNextPeer();
+        ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
+        Response response;
+            try {
+                System.out.println("• Sending select request to " + ipAddress);
+                response = target
+                        .path(path)
+                        .resolveTemplate("ipAddress", ipAddress)
+                        .queryParam("tableName", tableName)
+                        .queryParam("selectType", selectType)
+                        .queryParam("fromClient", false)
+                        .request()
+                        .post(Entity.entity(json, mediaType));
+        } catch (Exception e) {
+            return Response.ok(e.getMessage()).build();
+        }
+        return response;
     }
 }
