@@ -105,9 +105,11 @@ public class Database {
         Table table = getTableByName(tableName);
         if (table != null) {
             entries.stream().parallel().forEach(line -> {
-                ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
-                /* the entry can be added to the table */
-                table.insertEntry(entry);
+                if(line!=null){
+                    ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+                    /* the entry can be added to the table */
+                    table.insertEntry(entry);
+                } 
             });
 
         }
