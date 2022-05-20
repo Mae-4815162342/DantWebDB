@@ -1,22 +1,8 @@
 package model;
-import exception.ColumnNotExistsException;
-import exception.InvalidSelectRequestException;
-import exception.InvalidUpdateRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
-import model.requests.FindManySelect;
-import model.requests.FindUniqueSelect;
-import model.requests.GroupBy;
-import model.requests.Update;
-import model.requests.UpdateMany;
-import model.requests.Aggregate;
-import model.requests.BasicSchema;
-import model.requests.Delete;
-import model.requests.DeleteMany;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.google.gson.Gson;
 
@@ -78,11 +64,13 @@ public class Database {
         }
     }
 
-    public void insertIntoTable(String entry, Table table ) throws TableNotExistsException {
+    public void insertIntoTable(String tableName, String entry) throws TableNotExistsException {
         /* test if the table is in the database */
-        if(table != null) {
+        Table table = getTableByName(tableName);
+        if (table != null) {
+            ArrayList<String> row = new ArrayList<>(Arrays.asList(entry.split(",")));
             /* the entry can be added to the table */
-            table.insertEntry(entry);
+            table.insertEntry(row);
         }
     }
 
@@ -91,21 +79,15 @@ public class Database {
         return table.getColumns();
     }
 
-    public Object select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
+    public Object select(String jsonStr, String type, String tableName) throws Exception {
         Table table = this.getTableByName(tableName);
-        BasicSchema select;
+        SelectInterface select;
         switch(type){
             case "findUnique":
                 select = gson.fromJson(jsonStr, FindUniqueSelect.class);
                 break;
             case "findMany":
                 select = gson.fromJson(jsonStr, FindManySelect.class);
-                break;
-            case "Aggregate":
-                select = gson.fromJson(jsonStr, Aggregate.class);
-                break;
-            case "groupBy":
-                select = gson.fromJson(jsonStr, GroupBy.class);
                 break;
             default:
                 return null;
@@ -118,36 +100,18 @@ public class Database {
         }
     }
 
-    public Object update(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
-        Table table = this.getTableByName(tableName);
-        BasicSchema update;
-        switch(type){
-            case "updateUnique":
-                update = gson.fromJson(jsonStr, Update.class);
-                break;
-            case "updateMany":
-                update = gson.fromJson(jsonStr, UpdateMany.class);
-                break;
-            default:
-                return null;
+    public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {
+        /* test if the table is in the database */
+        Table table = getTableByName(tableName);
+        if (table != null) {
+            entries.stream().parallel().forEach(line -> {
+                if(line!=null){
+                    ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
+                    /* the entry can be added to the table */
+                    table.insertEntry(entry);
+                } 
+            });
+
         }
-        Object res = update.run(table);
-        return res;
-    }
-    public Object delete(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
-        Table table = this.getTableByName(tableName);
-        BasicSchema delete;
-        switch(type){
-            case "deleteUnique":
-            delete = gson.fromJson(jsonStr, Delete.class);
-                break;
-            case "deleteMany":
-            delete = gson.fromJson(jsonStr, DeleteMany.class);
-                break;
-            default:
-                return null;
-        }
-        Object res = delete.run(table);
-        return res;
     }
 }

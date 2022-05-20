@@ -20,7 +20,7 @@ public class App extends Application {
     public Set<Object> getSingletons() {
         Set<Object> sets = new HashSet<>(1);
         sets.add(new TableEndpoint());
-        sets.add(new InsertEndpoint());
+        sets.add(new InsertDataEndpoint());
         sets.add(new SelectEndpoint());
         sets.add(new UpdateEndpoint());
         sets.add(new DeleteEndpoint());

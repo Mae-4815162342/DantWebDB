@@ -6,7 +6,6 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.*;
@@ -16,28 +15,45 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Network {
 
     private String ipAdress;
     private ArrayList<String> peersIPAdressesList;
     private static Network instance;
+    private ResteasyClient client;
+    private static String baseURI = "http://{ipAddress}:8080/api";
+    private static AtomicInteger nextPeer = new AtomicInteger(0);
 
-    public Network(){
+    private Network() {
         this.ipAdress = getIpAddress();
         this.peersIPAdressesList = getPeersIpAdresses();
+        this.client = new ResteasyClientBuilder().build();
+        this.client.register(GsonProvider.class);
+    }
+
+    public int getNumberOfPeers() {
+        return peersIPAdressesList.size();
+    }
+
+    private int goToNextPeer() {
+        if ((nextPeer.get() + 1) < getNumberOfPeers()) {
+            return nextPeer.getAndIncrement();
+        } else {
+            return nextPeer.getAndSet(0);
+        }
     }
 
     private ArrayList<String> getPeersIpAdresses() {
         ArrayList<String> peers = new ArrayList<>();
-
         // file containing ip adresses of machines
         File file = new File("./src/main/java/machine_information.txt");
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String peerIpAddress;
             // reading ip address
-            while ((peerIpAddress = br.readLine()) != null){
+            while ((peerIpAddress = br.readLine()) != null) {
                 System.out.println("Adding peer with IP address = " + peerIpAddress);
                 // add every peers
                 if (!peerIpAddress.equals(getIpAdress())) {
@@ -74,28 +90,26 @@ public class Network {
     }
 
     public static Network getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new Network();
         }
         return instance;
+    }
+
+    private ResteasyClient getClient() {
+        return client;
     }
 
     public String getIpAdress() {
         return ipAdress;
     }
 
-    public ArrayList<String> getPeersIPAdressesList() {
-        return peersIPAdressesList;
-    }
+    public Response sendPostRequest(String path, Object input, String mediaType, String responseMessage) {
+        ArrayList<String> peers = peersIPAdressesList;
 
-    public Response sendPostRequest(String path, Object input, String mediaType, String responseMessage){
-        ArrayList<String> peers = getPeersIPAdressesList();
-        ResteasyClient client = new ResteasyClientBuilder().build();
-        String baseURI = "http://{ipAddress}:8080/api";
-        client.register(GsonProvider.class);
-        ResteasyWebTarget target = client.target(UriBuilder.fromPath(baseURI));
-        try{
-            for(String ipAddress : peers){
+        ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
+        try {
+            for (String ipAddress : peers) {
                 System.out.println("• Sending post request to " + ipAddress);
 
                 Response response = target
@@ -108,9 +122,32 @@ public class Network {
                 System.out.println("--> Status code :" + response.getStatus());
                 response.close();
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             return Response.ok(e.getMessage()).build();
         }
         return Response.ok(responseMessage).build();
+    }
+
+    public Response sendDataToPeer(ArrayList<String> buffer, String tableName, String path, String mediaType) {
+
+        ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
+        try {
+            String ipAddress = peersIPAdressesList.get(goToNextPeer());
+            System.out.println("• Sending data request to " + ipAddress);
+
+            Response response = target
+                    .path(path)
+                    .resolveTemplate("ipAddress", ipAddress)
+                    .queryParam("tableName", tableName)
+                    .request()
+                    .post(Entity.entity(buffer, mediaType));
+
+            System.out.println("--> Status code :" + response.readEntity(String.class));
+            response.close();
+        } catch (Exception e) {
+            return Response.ok(e.getMessage()).build();
+        }
+        return Response.ok("Data successfully inserted into " + tableName + " to a peer").build();
+
     }
 }

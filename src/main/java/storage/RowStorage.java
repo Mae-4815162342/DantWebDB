@@ -3,7 +3,6 @@ package storage;
 import model.Row;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RowStorage implements Storage<Row> {
@@ -11,8 +10,8 @@ public class RowStorage implements Storage<Row> {
     private final List<Row> rows = new ArrayList<>();
 
     @Override
-    public void insert(Row... row) {
-        rows.addAll(Arrays.asList(row));
+    public synchronized void insert(Row row) {
+        rows.add(row);
     }
 
     @Override

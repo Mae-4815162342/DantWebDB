@@ -1,13 +1,11 @@
 package controller;
 
-import exception.ColumnNotExistsException;
-import exception.InvalidSelectRequestException;
-import exception.InvalidUpdateRequestException;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 import model.Database;
 import model.Table;
 
+import java.util.ArrayList;
 // methodes recu par les endpoints create table, insert into table, ...
 import java.util.LinkedHashMap;
 
@@ -27,29 +25,26 @@ public class Worker {
     }
 
     public static void createTable(String name, LinkedHashMap<String, String> columns) throws TableExistsException {
-        database.addTable(name,columns);
+        database.addTable(name, columns);
     }
 
     public static Table getTableByName(String name) throws TableNotExistsException {
         return database.getTableByName(name);
     }
 
-    public void insertIntoTable(String line, Table table) throws TableNotExistsException {
-        database.insertIntoTable(line, table);
+    public void insertIntoTable(String tableName, String entry) throws TableNotExistsException {
+        database.insertIntoTable(tableName, entry);
+    }
+
+    public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {
+        database.insertChunkIntoTable(tableName, entries);
+    }
+
+    public Object select(String jsonStr, String type, String table) throws Exception {
+        return database.select(jsonStr, type, table);
     }
 
     public Object getColumns(String table) throws Exception {
         return database.getColumns(table);
-    }
-    public Object select(String jsonStr, String type, String table) throws Exception, TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
-        return database.select(jsonStr, type, table);
-    }
-
-    public Object update(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
-      return database.update(jsonStr, type, table);
-    }
-
-    public Object delete(String jsonStr, String type, String table) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
-        return database.delete(jsonStr, type, table);
     }
 }
