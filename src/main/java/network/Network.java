@@ -38,7 +38,7 @@ public class Network {
     }
 
     private int goToNextPeer() {
-        if (nextPeer.get() < getNumberOfPeers()) {
+        if ((nextPeer.get() + 1) < getNumberOfPeers()) {
             return nextPeer.getAndIncrement();
         } else {
             return nextPeer.getAndSet(0);

@@ -52,45 +52,48 @@ public class InsertDataEndpoint {
         buffer.readLine();
         /* offer task */
         /* PRODUCER */
+        int i = 1;
+        int j = 0;
         try {
             String line;
             while ((line = buffer.readLine()) != null) {
-                queue.offer(line);
+                i++;
+                if(i % (NB_PEERS + 1) == 0){
+                    Worker.getInstance().insertIntoTable(tableName, line);
+                }
+                else{
+                    queue.offer(line);
+                    j++;
+                }
             }
             System.out.println("FINITO");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        System.out.println("FINITO, " + i + " lignes parcourus, " + j + " lignes insérées dans la queue et " + (i-j) + " lignes insérées localement.");
+
         /* CONSUMERS */
         Callable<Integer> pollTask = () -> {
+            System.out.println("poll task created");
             ArrayList<String> chunk = new ArrayList<>();
             while (!queue.isEmpty()) {
-                while (chunk.size() < CHUNK_SIZE) {
+                while (chunk.size() < CHUNK_SIZE && !queue.isEmpty()) {
                     chunk.add(queue.poll());
                 }
                 // forward chunk to next peer
                 sendChunk(chunk, tableName);
                 chunk.clear();
             }
-            if(chunk.size() >0){
-                sendChunk(chunk, tableName);
-                chunk.clear();  
-            }
             return null;
         };
-        Collection<Callable<Integer>> callables = new ArrayList<>();
-        IntStream.rangeClosed(0, NB_PEERS).forEach(i-> {
-            callables.add(pollTask);
-        });
-        executorService.invokeAll(callables);
         try {
             System.out.println("Submitting poll task...");
             executorService.submit(pollTask);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            while (!queue.isEmpty()) {
+            while (!queue.isEmpty() ) {
                 
             }
             executorService.shutdown();
