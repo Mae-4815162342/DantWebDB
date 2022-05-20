@@ -1,12 +1,10 @@
 package network;
 
-import com.sun.mail.iap.ByteArray;
 import filter.GsonProvider;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
-import javax.print.DocFlavor;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -26,7 +24,7 @@ public class Network {
     private static Network instance;
     private ResteasyClient client;
     private static String baseURI = "http://{ipAddress}:8080/api";
-    private static AtomicInteger nextPeer = new AtomicInteger();
+    private static AtomicInteger nextPeer = new AtomicInteger(0);
 
     private Network() {
         this.ipAdress = getIpAddress();
@@ -37,6 +35,14 @@ public class Network {
 
     public int getNumberOfPeers() {
         return peersIPAdressesList.size();
+    }
+
+    private int goToNextPeer() {
+        if (nextPeer.get() < getNumberOfPeers()) {
+            return nextPeer.getAndIncrement();
+        } else {
+            return nextPeer.getAndSet(0);
+        }
     }
 
     private ArrayList<String> getPeersIpAdresses() {
@@ -122,20 +128,11 @@ public class Network {
         return Response.ok(responseMessage).build();
     }
 
-    private void goToNextPeer() {
-        if (nextPeer.get() != getNumberOfPeers()) {
-            nextPeer.getAndIncrement();
-        } else {
-            nextPeer.set(0);
-        }
-    }
-
     public Response sendDataToPeer(ArrayList<String> buffer, String tableName, String path, String mediaType) {
 
         ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
         try {
-            String ipAddress = peersIPAdressesList.get(nextPeer.get());
-            goToNextPeer();
+            String ipAddress = peersIPAdressesList.get(goToNextPeer());
             System.out.println("• Sending data request to " + ipAddress);
 
             Response response = target
