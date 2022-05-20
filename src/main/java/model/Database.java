@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 
 public class Database {
     private final HashMap<String, Table> tables;
-    private final Gson gson = new Gson();
 
     public Database() {
         this.tables = new HashMap<>();
@@ -91,6 +90,7 @@ public class Database {
         return table.getColumns();
     }
 
+<<<<<<< Updated upstream
     public Object select(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {
         Table table = this.getTableByName(tableName);
         BasicSchema select;
@@ -110,12 +110,17 @@ public class Database {
             default:
                 return null;
         }
+=======
+    public Object select(SelectInterface request, String tableName) throws Exception {
+        Table table = getTableByName(tableName);
+        Object res = null;
+>>>>>>> Stashed changes
         try {
-            Object res = select.run(table);
-            return res;
+            res = request.run(table);
         } catch (Exception e) {
             throw e;
         }
+        return res;
     }
 
     public Object update(String jsonStr, String type, String tableName) throws TableNotExistsException, ColumnNotExistsException, InvalidSelectRequestException, InvalidUpdateRequestException {

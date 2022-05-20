@@ -25,7 +25,12 @@ public class RowStorage implements Storage<Row> {
         return rows;
     }
 
+<<<<<<< Updated upstream
     public void delete(Row row) {
         rows.remove(row);
+=======
+    public int size() {
+        return rows.size();
+>>>>>>> Stashed changes
     }
 }

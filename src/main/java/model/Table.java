@@ -27,6 +27,10 @@ public class Table {
         return lines;
     }
 
+    public int getTableSize() {
+        return lines.size();
+    }
+
     public String getTableName() {
         return tableName;
     }
