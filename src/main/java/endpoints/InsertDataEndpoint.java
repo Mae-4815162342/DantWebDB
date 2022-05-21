@@ -91,6 +91,13 @@ public class InsertDataEndpoint {
                     queue.clear();
                 }
             }
+            if(j!=0){
+                executorService.submit(pollTask);
+                while(!queue.isEmpty()){
+
+                }
+                queue.clear();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
