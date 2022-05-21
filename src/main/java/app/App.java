@@ -22,7 +22,6 @@ public class App extends Application {
         sets.add(new TableEndpoint());
         sets.add(new InsertDataEndpoint());
         sets.add(new SelectEndpoint());
-        sets.add(new UpdateEndpoint());
         sets.add(new DeleteEndpoint());
         return sets;
     }

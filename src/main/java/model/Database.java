@@ -1,6 +1,9 @@
 package model;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
+import model.requests.BasicSchema;
+import model.requests.FindManySelect;
+import model.requests.FindUniqueSelect;
 
 import java.util.*;
 
@@ -68,9 +71,7 @@ public class Database {
         /* test if the table is in the database */
         Table table = getTableByName(tableName);
         if (table != null) {
-            ArrayList<String> row = new ArrayList<>(Arrays.asList(entry.split(",")));
-            /* the entry can be added to the table */
-            table.insertEntry(row);
+            table.insertEntry(entry);
         }
     }
 
@@ -81,7 +82,7 @@ public class Database {
 
     public Object select(String jsonStr, String type, String tableName) throws Exception {
         Table table = this.getTableByName(tableName);
-        SelectInterface select;
+        BasicSchema select;
         switch(type){
             case "findUnique":
                 select = gson.fromJson(jsonStr, FindUniqueSelect.class);
@@ -106,9 +107,7 @@ public class Database {
         if (table != null) {
             entries.stream().parallel().forEach(line -> {
                 if(line!=null){
-                    ArrayList<String> entry = new ArrayList<>(Arrays.asList(line.split(",")));
-                    /* the entry can be added to the table */
-                    table.insertEntry(entry);
+                    table.insertEntry(line);
                 } 
             });
 
