@@ -20,16 +20,16 @@ public class DeleteEndpoint {
   @DELETE
   @Path("/delete")
   public Response select(@Context UriInfo uriInfo, String jsonStr){
-    MultivaluedMap<String, String> queries  = uriInfo.getQueryParameters();
-    String tableName = queries.get("table").get(0);
+    // MultivaluedMap<String, String> queries  = uriInfo.getQueryParameters();
+    /* String tableName = queries.get("table").get(0);
     String type = queries.get("type").get(0);
-    Object res;
+    Object res; */
     try{
-      res = Worker.getInstance().delete(jsonStr, type, tableName);
+      //res = Worker.getInstance().delete(jsonStr, type, tableName);
     }
     catch(Exception e){
       return Response.status(400).entity(e.getMessage() + "\n").type("plain/text").build();
     }
-    return Response.ok(res).build();
+    return Response.ok("Unavailable").build();
   }
 }
