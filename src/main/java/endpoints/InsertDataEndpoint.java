@@ -24,7 +24,8 @@ import java.util.stream.IntStream;
 
 @Path("/api")
 public class InsertDataEndpoint {
-    private static final int CHUNK_SIZE = 100_000;
+    private static final int CHUNK_SIZE = 50_000;
+    private static final int MAX_LINES = 1_000_000;
     private final Network net = Network.getInstance();
 
     public void sendChunk(ArrayList<String> buffer, String tableName) {
@@ -54,26 +55,7 @@ public class InsertDataEndpoint {
         /* PRODUCER */
         int i = 1;
         int j = 0;
-        try {
-            String line;
-            while ((line = buffer.readLine()) != null) {
-                i++;
-                if(i % (NB_PEERS + 1) == 0){
-                    Worker.getInstance().insertIntoTable(tableName, line);
-                }
-                else{
-                    queue.offer(line);
-                    j++;
-                }
-            }
-            System.out.println("FINITO");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("FINITO, " + i + " lignes parcourus, " + j + " lignes insérées dans la queue et " + (i-j) + " lignes insérées localement.");
-
-        /* CONSUMERS */
+         /* CONSUMERS */
         Callable<Integer> pollTask = () -> {
             System.out.println("poll task created");
             ArrayList<String> chunk = new ArrayList<>();
@@ -88,18 +70,34 @@ public class InsertDataEndpoint {
             return null;
         };
         try {
-            System.out.println("Submitting poll task...");
-            executorService.submit(pollTask);
+            String line;
+            while ((line = buffer.readLine()) != null) {
+                if(j != MAX_LINES){
+                    i++;
+                    if(i % (NB_PEERS + 1) == 0){
+                        Worker.getInstance().insertIntoTable(tableName, line);
+                    }
+                    else{
+                        queue.offer(line);
+                        j++;
+                    }
+                }
+                else{
+                    executorService.submit(pollTask);
+                    while(!queue.isEmpty()){
+    
+                    }
+                    j = 0;
+                    queue.clear();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            while (!queue.isEmpty() ) {
-                
-            }
-            executorService.shutdown();
-            inputStream.close();
-            buffer.close();
         }
+
+        executorService.shutdown();
+        inputStream.close();
+        buffer.close();
     }
 
     @POST
