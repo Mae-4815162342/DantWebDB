@@ -1,5 +1,7 @@
 package model;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import com.google.common.base.Splitter;
 
 
@@ -19,6 +21,6 @@ public class Row {
         this.columnValuesMap = columnValuesMap;
     }
     public List<String> toList() {
-        return Splitter.on(';').splitToList(columnValuesMap);
+        return Splitter.on(Pattern.compile(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")).splitToList(columnValuesMap);
     }
 }
