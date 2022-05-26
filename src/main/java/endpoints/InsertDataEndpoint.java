@@ -129,7 +129,7 @@ public class InsertDataEndpoint {
             parseCSV(inputPart, tableName);
         }
         nameInputStream.close();
-        return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!\n").build();
+        return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!").build();
     }
 
 
