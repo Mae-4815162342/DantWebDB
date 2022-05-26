@@ -1,9 +1,11 @@
 package model;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
+import model.requests.Aggregate;
 import model.requests.BasicSchema;
 import model.requests.FindManySelect;
 import model.requests.FindUniqueSelect;
+import model.requests.GroupBy;
 
 import java.util.*;
 
@@ -89,6 +91,12 @@ public class Database {
                 break;
             case "findMany":
                 select = gson.fromJson(jsonStr, FindManySelect.class);
+                break;
+            case "Aggregate":
+                select = gson.fromJson(jsonStr, Aggregate.class);
+                break;
+            case "GroupBy":
+                select = gson.fromJson(jsonStr, GroupBy.class);
                 break;
             default:
                 return null;

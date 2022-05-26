@@ -21,6 +21,6 @@ public class Row {
         this.columnValuesMap = columnValuesMap;
     }
     public List<String> toList() {
-        return Splitter.on(Pattern.compile(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")).splitToList(columnValuesMap);
+        return Splitter.on(Pattern.compile(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)*(?=(?:[^;]*\"[^;]*\")*[^;]*$)")).splitToList(columnValuesMap);
     }
 }
