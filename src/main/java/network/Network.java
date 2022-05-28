@@ -1,6 +1,9 @@
 package network;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import filter.GsonProvider;
+import model.requests.FindManySelect;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -12,9 +15,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Network {
@@ -149,5 +150,38 @@ public class Network {
         }
         return Response.ok("Data successfully inserted into " + tableName + " to a peer").build();
 
+    }
+
+    public String getIpAdressFromIndex(int i) {
+        return peersIPAdressesList.get(i);
+    }
+
+    public List<HashMap<String, String>> sendSelectToPeer(String ipAddress,String json, String tableName, String selectType, String path, String mediaType) {
+        ResteasyWebTarget target = getClient().target(UriBuilder.fromPath(baseURI));
+        Response response;
+        List<HashMap<String, String>> res;
+        Gson gson = new Gson();
+        try {
+            System.out.println("• Sending select request to " + ipAddress);
+            response = target
+                    .path(path)
+                    .resolveTemplate("ipAddress", ipAddress)
+                    .queryParam("table", tableName)
+                    .queryParam("type", selectType)
+                    .queryParam("fromClient", false)
+                    .request()
+                    .post(Entity.entity(json, mediaType));
+
+            System.out.println("--> Status code :" + response.getStatus());
+            if(selectType.equals("findUnique")) {
+                res = gson.fromJson(response.readEntity(String.class), new TypeToken<HashMap<String,String>>(){}.getType());
+            } else {
+                res = gson.fromJson(response.readEntity(String.class), new TypeToken<List<HashMap<String, String>>>() {}.getType());
+            }
+            response.close();
+        } catch (Exception e) {
+            return null;
+        }
+        return res;
     }
 }
