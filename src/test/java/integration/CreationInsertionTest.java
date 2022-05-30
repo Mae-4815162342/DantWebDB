@@ -23,7 +23,7 @@ import org.junit.runners.MethodSorters;
 import filter.GsonProvider;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class Scenario1 {
+public class CreationInsertionTest {
   private ResteasyClient client;
   private final String baseURI = "http://localhost:8080/api";
   private ResteasyWebTarget target;
@@ -80,7 +80,7 @@ public class Scenario1 {
         .request()
         .post(Entity.entity(input, MediaType.APPLICATION_JSON));
     String actual = response.readEntity(String.class);
-    String expected = "titanic already exists in the database ! already exists in the database !";
+    String expected = "titanic already exists in the database !";
     assertEquals(expected, actual);
     response.close();
   }
@@ -99,41 +99,5 @@ public class Scenario1 {
     String expected = "Values from file inserted into titanic!";
     assertEquals(expected, actual);
     response.close();
-  }
-
-  @Test
-  public void t4_AggregateCount() throws IOException {
-    String actual = sendGetRequest("{\n  \"_count\": [\n    \"Cabin\", \"Age\", \"_all\"\n  ]\n}", "titanic",
-        "Aggregate");
-    String expected = "{\"_count\":{\"Cabin\":204.0,\"Age\":713.0,\"_all\":890.0}}";
-    assertEquals(expected, actual);
-  }
-
-  @Test
-  public void t5_AggregateSum() throws IOException {
-    String actual = sendGetRequest("{\n  \"_sum\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic", "Aggregate");
-    String expected = "{\"_sum\":{\"PassengerId\":397385.0,\"Age\":21183.17}}";
-    assertEquals(expected, actual);
-  }
-
-  @Test
-  public void t6_AggregateAvg() throws IOException {
-    String actual = sendGetRequest("{\n  \"_avg\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic", "Aggregate");
-    String expected = "{\"_avg\":{\"PassengerId\":446.5,\"Age\":23.8}}";
-    assertEquals(expected, actual);
-  }
-
-  @Test
-  public void t7_AggregateMax() throws IOException {
-    String actual = sendGetRequest("{\n  \"_max\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic", "Aggregate");
-    String expected = "{\"_max\":{\"PassengerId\":891.0,\"Age\":80.0}}";
-    assertEquals(expected, actual);
-  }
-
-  @Test
-  public void t8_AggregateMin() throws IOException {
-    String actual = sendGetRequest("{\n  \"_min\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic", "Aggregate");
-    String expected = "{\"_min\":{\"PassengerId\":0.0,\"Age\":0.0}}";
-    assertEquals(expected, actual);
   }
 }
