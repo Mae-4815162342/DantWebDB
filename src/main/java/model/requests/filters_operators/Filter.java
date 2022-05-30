@@ -7,24 +7,31 @@ public class Filter {
   private Object notequals;
   private List<Object> in;
   private List<Object> notIn;
-  private double lt;
-  private double lte;
-  private double gt;
-  private double gte;
+  private Double lt;
+  private Double lte;
+  private Double gt;
+  private Double gte;
   private String contains;
   private String startsWith;
   private String endsWith;
-  
+  public Object parseObject(String value, String type){
+    switch(type){
+      case "int":
+        return Double.parseDouble(value);
+      default:
+        return value;
+    }
+  }
   public boolean evaluate(String value, String type){
     boolean valid = true;
     valid = (equals!=null ? (type.equals("String") ? true && (value.equals((String) equals)) : true && (Double.parseDouble(value) == ((Double) equals))) : valid);
     valid = (notequals!=null ? (type.equals("String") ? true && (!value.equals((String) notequals)) : true && (Double.parseDouble(value) != ((Double) notequals))) : valid);
-    valid = (in!=null ? valid && in.contains(value) : valid);
-    valid = (notIn!=null ? valid && !notIn.contains(value) : valid);
-    valid = (lt!=0 ? valid && (Double.parseDouble(value) < lt) : valid);
-    valid = (lte!=0 ? valid && (Double.parseDouble(value) <= lte): valid);
-    valid = (gte!=0 ? valid && (Double.parseDouble(value) >= gte) : valid);
-    valid = (gt!=0 ? valid && (Double.parseDouble(value) > gt) : valid);
+    valid = (in!=null ? valid && in.contains(parseObject(value, type)) : valid);
+    valid = (notIn!=null ? valid && !notIn.contains(parseObject(value, type)) : valid);
+    valid = (lt!=null ? valid && Double.compare(Double.parseDouble(value),lt) < 0 : valid);
+    valid = (lte!=null ? valid && Double.compare(Double.parseDouble(value),lte) <= 0: valid);
+    valid = (gte!=null ? valid && Double.compare(Double.parseDouble(value),gte) >= 0 : valid);
+    valid = (gt!=null ? valid && Double.compare(Double.parseDouble(value),gt) > 0 : valid);
     valid = (contains!=null ? valid && (value.contains(contains)) : valid);
     valid = (startsWith!=null ? valid && (value.startsWith(startsWith)) : valid);
     valid = (endsWith!=null ? valid && (value.endsWith(endsWith)) : valid);

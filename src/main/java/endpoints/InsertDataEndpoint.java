@@ -50,7 +50,6 @@ public class InsertDataEndpoint {
         Table table = Worker.getInstance().getTableByName(tableName);
         System.out.println("Running async offer task...");
         buffer.readLine();
-        buffer.readLine();
         /* offer task */
         /* PRODUCER */
         int i = 1;
