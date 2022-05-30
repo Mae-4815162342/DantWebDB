@@ -60,7 +60,7 @@ public class Database {
         try{
             /* test if the table is in the database */
             getTableByName(tableName);
-            throw new TableExistsException(tableName + " already exists in the database !");
+            throw new TableExistsException(tableName);
 
         } catch (TableNotExistsException e) {
             /* the table can be added to database */
