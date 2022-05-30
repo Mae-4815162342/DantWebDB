@@ -16,13 +16,10 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 import filter.GsonProvider;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AggregateTest {
   private ResteasyClient client;
   private final String baseURI = "http://localhost:8080/api";
@@ -70,36 +67,36 @@ public class AggregateTest {
   }
 
   @Test
-  public void t4_AggregateCount() throws IOException {
+  public void AggregateCount() throws IOException {
     String actual = sendGetRequest("{\n  \"_count\": [\n    \"Cabin\", \"Age\", \"_all\"\n  ]\n}", "titanic1",
         "Aggregate");
-    String expected = "{\"_count\":{\"Cabin\":204.0,\"Age\":713.0,\"_all\":890.0}}";
+    String expected = "{\"_count\":{\"Cabin\":204.0,\"Age\":714.0,\"_all\":891.0}}";
     assertEquals(expected, actual);
   }
 
   @Test
-  public void t5_AggregateSum() throws IOException {
+  public void AggregateSum() throws IOException {
     String actual = sendGetRequest("{\n  \"_sum\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
-    String expected = "{\"_sum\":{\"PassengerId\":397385.0,\"Age\":21183.17}}";
+    String expected = "{\"_sum\":{\"PassengerId\":397386.0,\"Age\":21205.17}}";
     assertEquals(expected, actual);
   }
 
   @Test
-  public void t6_AggregateAvg() throws IOException {
+  public void AggregateAvg() throws IOException {
     String actual = sendGetRequest("{\n  \"_avg\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
-    String expected = "{\"_avg\":{\"PassengerId\":446.5,\"Age\":23.8}}";
+    String expected = "{\"_avg\":{\"PassengerId\":446.0,\"Age\":23.8}}";
     assertEquals(expected, actual);
   }
 
   @Test
-  public void t7_AggregateMax() throws IOException {
+  public void AggregateMax() throws IOException {
     String actual = sendGetRequest("{\n  \"_max\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
     String expected = "{\"_max\":{\"PassengerId\":891.0,\"Age\":80.0}}";
     assertEquals(expected, actual);
   }
 
   @Test
-  public void t8_AggregateMin() throws IOException {
+  public void AggregateMin() throws IOException {
     String actual = sendGetRequest("{\n  \"_min\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
     String expected = "{\"_min\":{\"PassengerId\":0.0,\"Age\":0.0}}";
     assertEquals(expected, actual);
