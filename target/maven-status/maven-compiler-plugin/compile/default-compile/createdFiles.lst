@@ -1,4 +1,3 @@
+storage\Rows\IntTree.class
+storage\Rows\Tree.class
 exception\TableNotExistsException.class
-endpoints\InsertEndpoint.class
-endpoints\CreateEndpoint.class
-network\Network.class

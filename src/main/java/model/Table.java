@@ -7,6 +7,8 @@ import java.util.*;
 public class Table {
     private String tableName;
     private LinkedHashMap<String, Tree> headers=new LinkedHashMap<>();
+    private ArrayList<String>  columnName=new ArrayList<>();
+
     private final RowObjectStorage lines;
     private ArrayList<Class> types=new ArrayList<>();
     private int nb;
@@ -40,9 +42,10 @@ public class Table {
 
     public void insertEntry(String line) {
         String[] tab=line.split(",");
+       // for(int i=0;i<)
         
-        RowObject row =  new RowObject(null);
-        lines.insert(row);
+       // RowObject row =  new RowObject(null);
+       // lines.insert(row);
     }
 
    /* public LinkedHashMap<String, String> getColumns() {

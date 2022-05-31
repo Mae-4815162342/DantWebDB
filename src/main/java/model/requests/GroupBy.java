@@ -180,7 +180,7 @@ public class GroupBy implements BasicSchema{
   }
 
   public HashMap<String,HashMap<String,Integer>> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException {
-    if(select==null){
+   /* if(select==null){
       select = table.getColumns().keySet(); 
     }
     List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
@@ -193,6 +193,7 @@ public class GroupBy implements BasicSchema{
         break;
       }
     }
-    return res;
+    return res;*/
+    return null;
   }
 }

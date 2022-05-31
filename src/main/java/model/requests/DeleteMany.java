@@ -27,14 +27,14 @@ public class DeleteMany implements BasicSchema {
       for(String targetColumn : updatedLabels){
         newRow.set(columnLabel.indexOf(targetColumn), data.get(targetColumn));
       }
-      table.deleteEntry(row);
+      //table.deleteEntry(row);
     }
     return valid;
   }
 
   @Override
   public Object run(Table table) throws ColumnNotExistsException, InvalidUpdateRequestException {
-    if(where==null || data==null){
+    /*if(where==null || data==null){
       throw new InvalidUpdateRequestException();
     }
     Set<String> updatedLabels = data.keySet();
@@ -47,6 +47,7 @@ public class DeleteMany implements BasicSchema {
     if(found){
       return "Deletions made successfully";
     }
-    return "Unfound row, please specify an existing row";
+    return "Unfound row, please specify an existing row";*/
+    return null;
   }
 }

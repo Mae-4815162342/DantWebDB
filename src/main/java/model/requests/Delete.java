@@ -27,7 +27,7 @@ public class Delete implements BasicSchema {
         for(String targetColumn : updatedLabels){
           newRow.set(columnLabel.indexOf(targetColumn), data.get(targetColumn));
         }
-        table.deleteEntry(row);
+        //table.deleteEntry(row);
         return true;
       }
       return false;
@@ -38,14 +38,14 @@ public class Delete implements BasicSchema {
     if(where==null || data==null){
       throw new InvalidUpdateRequestException();
     }
-    Set<String> updatedLabels = data.keySet();
+    /*Set<String> updatedLabels = data.keySet();
     List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
       if(handleRow(table, row, updatedLabels, columnLabel)){
         return "Deletion made successfully";
       }
-    }
+    }*/
     return "Unfound row, please specify an existing row";
   }
 }
