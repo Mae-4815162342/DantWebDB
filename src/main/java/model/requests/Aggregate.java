@@ -14,7 +14,7 @@ import model.Row;
 import model.Table;
 import model.requests.filters_operators.Filter;
 
-public class Aggregate implements BasicSchema{
+public class Aggregate implements SelectSchema{
   private int limit = -1;
   private Set<String> select;
   private HashMap<String, Filter> where;
@@ -25,6 +25,11 @@ public class Aggregate implements BasicSchema{
   private Set<String> _sum;
   private Set<String> _min;
   private int average_total = 0;
+  private Table table;
+  private boolean fromClient;
+  private List<String> columnLabel;
+  private LinkedHashMap<String, String> columns;
+  private HashMap<String,HashMap<String,Double>> result;
 
   private void calculateAverage(HashMap<String, HashMap<String,Double>> res){
     if(_avg!=null){
@@ -43,7 +48,7 @@ public class Aggregate implements BasicSchema{
     res.put(operationLabel, values);
   }
 
-  private void checkAggregate(LinkedHashMap<String, String> columns, HashMap<String, HashMap<String,Double>> res) throws ColumnNotExistsException{
+  private void checkAggregate(HashMap<String, HashMap<String,Double>> res) throws ColumnNotExistsException{
     if(_count != null){
       Set<String> copy = new HashSet<>(_count) ;
       copy.removeIf(filter -> !((columns.containsKey(filter) && columns.get(filter).equals("int"))) || !filter.equals("_all"));      
@@ -91,10 +96,15 @@ public class Aggregate implements BasicSchema{
     }
   } 
 
-  private void count(Row row, List<String> columnLabel, HashMap<String, HashMap<String,Double>> res){
+  private void count(Row row, HashMap<String, String> machineRow){
     if(_count!=null){
-      HashMap<String,Double> value = res.get("_count");
-      List<String> rowList = row.toList();
+      HashMap<String,Double> value = result.get("_count");
+      List<String> rowList;
+      if(row != null) {
+        rowList = row.toList();
+      } else {
+        rowList = (List<String>) machineRow.values();
+      }
       for(String targetLabels : _count){
         if(targetLabels.equals("_all")|| (!targetLabels.equals("_all") && !rowList.get(columnLabel.indexOf(targetLabels)).equals(""))){
           value.replace(targetLabels, value.get(targetLabels), value.get(targetLabels) + 1);
@@ -102,11 +112,16 @@ public class Aggregate implements BasicSchema{
       }
     }
   }
-  private void average(Row row, List<String> columnLabel, HashMap<String, HashMap<String,Double>> res){
+  private void average(Row row, HashMap<String, String> machineRow){
     if(_avg!=null){
       average_total++;
-      HashMap<String,Double> value = res.get("_avg");
-      List<String> rowList = row.toList();
+      HashMap<String,Double> value = result.get("_avg");
+      List<String> rowList;
+      if(row != null) {
+        rowList = row.toList();
+      } else {
+        rowList = (List<String>) machineRow.values();
+      }
       for(String targetLabels : _avg){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -116,10 +131,15 @@ public class Aggregate implements BasicSchema{
       }
     }
   }
-  private void maximum(Row row, List<String> columnLabel, HashMap<String, HashMap<String,Double>> res){
+  private void maximum(Row row, HashMap<String, String> machineRow){
     if(_max!=null){
-      HashMap<String,Double> value = res.get("_max");
-      List<String> rowList = row.toList();
+      HashMap<String,Double> value = result.get("_max");
+      List<String> rowList;
+      if(row != null) {
+        rowList = row.toList();
+      } else {
+        rowList = (List<String>) machineRow.values();
+      }
       for(String targetLabels : _max){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -131,10 +151,16 @@ public class Aggregate implements BasicSchema{
       }
     }
   }
-  private void minimum(Row row, List<String> columnLabel, HashMap<String, HashMap<String,Double>> res){
+
+  private void minimum(Row row, HashMap<String, String> machineRow){
     if(_min!=null){
-      HashMap<String,Double> value = res.get("_min");
-      List<String> rowList = row.toList();
+      HashMap<String,Double> value = result.get("_min");
+      List<String> rowList;
+      if(row != null) {
+        rowList = row.toList();
+      } else {
+        rowList = (List<String>) machineRow.values();
+      }
       for(String targetLabels : _min){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -146,10 +172,15 @@ public class Aggregate implements BasicSchema{
       }
     }
   }
-  private void sum(Row row, List<String> columnLabel, HashMap<String, HashMap<String,Double>> res){
+  private void sum(Row row, HashMap<String, String> machineRow){
     if(_sum!=null){
-      HashMap<String,Double> value = res.get("_sum");
-      List<String> rowList = row.toList();
+      HashMap<String,Double> value = result.get("_sum");
+      List<String> rowList;
+      if(row != null) {
+        rowList = row.toList();
+      } else {
+        rowList = (List<String>) machineRow.values();
+      }
       for(String targetLabels : _sum){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -181,45 +212,86 @@ public class Aggregate implements BasicSchema{
     return null;
   } */
 
-  private void handleRow(Row row,  List<String> columnLabel,  HashMap<String, HashMap<String, Double>> res, LinkedHashMap<String, String> columns){
-    List<String> values = row.toList();
+  private synchronized void handleRow(Row row, HashMap<String, String> machineRow){
     boolean valid = true;
-    if(where!=null){
-      for(String targetColumn : where.keySet()){
-        if(valid){
-          Filter UserFilter = where.get(targetColumn);
-          String value = values.get(columnLabel.indexOf(targetColumn));
-					valid = (!value.equals("") ? valid && UserFilter.evaluate(value, columns.get(targetColumn)) : false);
+    if(row != null) {
+      List<String> values = row.toList();
+      if (where != null) {
+        for (String targetColumn : where.keySet()) {
+          if (valid) {
+            Filter UserFilter = where.get(targetColumn);
+            String value = values.get(columnLabel.indexOf(targetColumn));
+            valid = (!value.equals("") ? valid && UserFilter.evaluate(value, columns.get(targetColumn)) : false);
+          }
         }
       }
     }
     if(valid){
-      count(row, columnLabel, res);
-      average(row, columnLabel, res);
-      maximum(row, columnLabel, res);
-      minimum(row, columnLabel, res);
-      sum(row, columnLabel, res);
+      count(row, machineRow);
+      average(row, machineRow);
+      maximum(row, machineRow);
+      minimum(row, machineRow);
+      sum(row, machineRow);
       if(limit != -1){
         limit = limit - 1;
       }
     }
   }
 
-  public HashMap<String,HashMap<String,Double>> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException {
-    if(select==null){
-      select = table.getColumns().keySet(); 
-    }
-    List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
-    HashMap<String, HashMap<String,Double>> res = new HashMap<>();
-    checkAggregate(table.getColumns(), res);
+  public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      handleRow(row, columnLabel, res, table.getColumns());
+      handleRow(row, null);
       if(limit == 0){
         break;
       }
     }
-    calculateAverage(res);
-    return res;
+  }
+
+  @Override
+  public Object getRes() {
+    calculateAverage(result);
+    return result;
+  }
+
+  @Override
+  public void setRequest(Table table, boolean fromClient) throws Exception {
+    this.table = table;
+    this.fromClient = fromClient;
+    if(select==null){
+      select = table.getColumns().keySet();
+    }
+    columnLabel = new ArrayList<String>(table.getColumns().keySet());
+    columns = table.getColumns();
+    result = new HashMap<>();
+    checkAggregate(result);
+  }
+
+  @Override
+  public int getLimit() {
+    return -1;
+  }
+
+  @Override
+  public boolean hasSelect() {
+    return select != null;
+  }
+
+  @Override
+  public boolean hasWhere() {
+    return where != null;
+  }
+
+  @Override
+  public void addLines(Object lines) {
+    if(limit == 0){
+      return;
+    }
+    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
+      handleRow(null, row);
+      if(limit == 0){
+        break;
+      }
+    }
   }
 }

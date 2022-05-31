@@ -13,36 +13,50 @@ import model.Row;
 import model.Table;
 import model.requests.filters_operators.Filter;
 
-public class FindManySelect implements BasicSchema{
+public class FindManySelect implements SelectSchema {
   private int limit = -1;
   private Set<String> select;
   private HashMap<String, Filter> where;
   private HashMap<String, String> orderBy;
+  private String groupBy;
+  private List<HashMap<String,String>> result;
+  private Table table;
+  private List<String> columnLabel;
+  private LinkedHashMap<String, String> columns;
+  private boolean fromClient;
   
-  private void handleRow(Row row,  List<String> columnLabel,  List<HashMap<String,String>> res, LinkedHashMap<String, String> columns){
-    List<String> values = row.toList();
-    boolean valid = true;
-    if(where!=null){
-      for(String targetedColumn : where.keySet()){
-        if(valid){
-          Filter UserFilter = where.get(targetedColumn);
-          String value = values.get(columnLabel.indexOf(targetedColumn));
-					valid = (!value.equals("") ? valid && UserFilter.evaluate(value, columns.get(targetedColumn)) : false);
+  private synchronized void handleRow(Row row, HashMap<String, String> rowFromMachine){
+    if(row != null) {
+      List<String> values = row.toList();
+      boolean valid = true;
+      if (where != null) {
+        for (String targetedColumn : where.keySet()) {
+          if (valid) {
+            Filter UserFilter = where.get(targetedColumn);
+            String value = values.get(columnLabel.indexOf(targetedColumn));
+            valid = (!value.equals("") ? valid && UserFilter.evaluate(value, columns.get(targetedColumn)) : false);
+          }
         }
       }
-    }
-    if(valid){
-      HashMap<String, String> resulatRow = new HashMap<String,String>();
-      for(String targetedColumn : select){
-        resulatRow.put(targetedColumn, values.get(columnLabel.indexOf(targetedColumn)));
+
+      if (valid) {
+        HashMap<String, String> resulatRow = new HashMap<String, String>();
+        for (String targetedColumn : select) {
+          resulatRow.put(targetedColumn, values.get(columnLabel.indexOf(targetedColumn)));
+        }
+        result.add(resulatRow);
+        if (limit != -1) {
+          limit = limit - 1;
+        }
       }
-      res.add(resulatRow);
-      if(limit != -1){
+    } else {
+      result.add(rowFromMachine);
+      if (limit != -1) {
         limit = limit - 1;
       }
     }
   }
-  
+
   private List<HashMap<String,String>> orderResult(List<HashMap<String,String>> res, LinkedHashMap<String, String> columnLabel){
     res.sort(new Comparator<HashMap<String,String>>() {
       @Override
@@ -65,22 +79,60 @@ public class FindManySelect implements BasicSchema{
     return null;
   }
 
-  public List<HashMap<String,String>> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException {
-    if(select==null){
-      select = table.getColumns().keySet(); 
-    }
-    List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
-    List<HashMap<String,String>> res = new ArrayList<>();
+  public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
     List<Row> lines = table.getLines().selectAll();
-    for(Row row : lines){
-      handleRow(row, columnLabel, res, table.getColumns());
+    for (Row row : lines) {
+      handleRow(row, null);
+      if (limit == 0) {
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void setRequest(Table table, boolean fromClient) throws Exception{
+    this.table = table;
+    this.fromClient = fromClient;
+    if (select == null) {
+      select = table.getColumns().keySet();
+    }
+    columnLabel = new ArrayList<String>(table.getColumns().keySet());
+    result = new ArrayList<>();
+    columns = table.getColumns();
+  }
+
+  public int getLimit() {
+    return this.limit;
+  }
+
+  @Override
+  public boolean hasWhere() {
+    return this.where != null;
+  }
+
+  @Override
+  public boolean hasSelect() {
+    return this.select != null;
+  }
+
+  @Override
+  public void addLines(Object lines) {
+    if(limit == 0){
+      return;
+    }
+    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
+      handleRow(null, row);
       if(limit == 0){
         break;
       }
     }
-    if(orderBy!=null){
-      orderResult(res, table.getColumns());
+  }
+
+  @Override
+  public Object getRes() {
+    if(orderBy!=null && fromClient){
+      orderResult(result, table.getColumns());
     }
-    return res;
+    return result;
   }
 }
