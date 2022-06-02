@@ -60,7 +60,7 @@ public class Database {
         try{
             /* test if the table is in the database */
             getTableByName(tableName);
-            throw new TableExistsException(tableName + " already exists in the database !");
+            throw new TableExistsException(tableName);
 
         } catch (TableNotExistsException e) {
             /* the table can be added to database */
@@ -82,6 +82,33 @@ public class Database {
         return table.getColumns();
     }
 
+    public Object select(String jsonStr, String type, String tableName) throws Exception {
+        Table table = this.getTableByName(tableName);
+        BasicSchema select;
+        switch(type){
+            case "findUnique":
+                select = gson.fromJson(jsonStr, FindUniqueSelect.class);
+                break;
+            case "findMany":
+                select = gson.fromJson(jsonStr, FindManySelect.class);
+                break;
+            case "Aggregate":
+                select = gson.fromJson(jsonStr, Aggregate.class);
+                break;
+            case "groupBy":
+                select = gson.fromJson(jsonStr, GroupBy.class);
+                break;
+            default:
+                return null;
+        }
+        try {
+            Object res = select.run(table);
+            return res;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+  
     public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {
         /* test if the table is in the database */
         Table table = getTableByName(tableName);

@@ -50,7 +50,6 @@ public class InsertDataEndpoint {
         Table table = Worker.getInstance().getTableByName(tableName);
         System.out.println("Running async offer task...");
         buffer.readLine();
-        buffer.readLine();
         /* offer task */
         /* PRODUCER */
         int i = 1;
@@ -129,7 +128,7 @@ public class InsertDataEndpoint {
             parseCSV(inputPart, tableName);
         }
         nameInputStream.close();
-        return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!\n").build();
+        return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!").build();
     }
 
 
