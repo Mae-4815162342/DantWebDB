@@ -38,4 +38,8 @@ public class Table {
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
+
+    public int getTableSize() {
+        return lines.size();
+    }
 }

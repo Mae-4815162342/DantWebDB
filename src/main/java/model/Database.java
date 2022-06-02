@@ -108,7 +108,7 @@ public class Database {
             throw e;
         }
     }
-
+  
     public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {
         /* test if the table is in the database */
         Table table = getTableByName(tableName);

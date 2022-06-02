@@ -27,4 +27,8 @@ public class RowStorage implements Storage<Row> {
     public void delete(Row row) {
         rows.remove(row);
     }
+
+    public int size() {
+        return rows.size();
+    }
 }

@@ -12,11 +12,12 @@ import java.util.function.Predicate;
 
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
+import jdk.nio.Channels;
 import model.Row;
 import model.Table;
 import model.requests.filters_operators.Filter;
 
-public class GroupBy implements BasicSchema{
+public class GroupBy implements SelectSchema {
   private int limit = -1;
   private Set<String> select;
   private HashMap<String, Filter> where;
@@ -28,8 +29,13 @@ public class GroupBy implements BasicSchema{
   private Set<String> _max;
   private Set<String> _sum;
   private Set<String> _min;
+  private Table table;
+  private List<String> columnLabel;
+  private LinkedHashMap<String, String> columns;
+  private HashMap<Set<String>, Integer> groupWorkforce;
+  private HashMap<Set<String>, HashMap<String, Object>> groups;
 
-  private Set<String> createKey(Row row, List<String> columnLabel) throws ColumnNotExistsException{
+  private Set<String> createKey(Row row) throws ColumnNotExistsException{
     Set<String> res = new HashSet<>();
     List<String> rowList = row.toList();
     for(String groupElement : by){
@@ -54,9 +60,9 @@ public class GroupBy implements BasicSchema{
     }
     return res;
   }
-  private HashMap<String, Object> createGroup(Row row, List<String> columnLabel, LinkedHashMap<String, String> columns) throws ColumnNotExistsException{
+  private HashMap<String, Object> createGroup(Row row, HashMap<String, String> machineRow) throws ColumnNotExistsException{
     HashMap<String, Object> res = new HashMap<>();
-    List<String> rowList = row.toList();
+    List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
     for(String groupElement : by){
       res.put(groupElement, rowList.get(columnLabel.indexOf(groupElement)));
     }
@@ -68,7 +74,7 @@ public class GroupBy implements BasicSchema{
     }
     return res;
   }  
-  private void calculateAverage(HashMap<Set<String>, Integer> groupWorkforce, HashMap<Set<String>, HashMap<String, Object>> res){
+  private void calculateAverage(HashMap<Set<String>, HashMap<String, Object>> res){
     if(_avg!=null){
       for(Set<String> groupName : res.keySet()){
         HashMap<String,Double> oldValues = (HashMap<String,Double>) res.get(groupName).get("_avg");
@@ -136,10 +142,10 @@ public class GroupBy implements BasicSchema{
     }
   } 
 
-  private void count(Row row, List<String> columnLabel,  HashMap<String, Object> group){
+  private void count(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_count!=null){
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_count");
-      List<String> rowList = row.toList();
+      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
       for(String targetLabels : _count){
         if(targetLabels.equals("_all")|| (!targetLabels.equals("_all") && !rowList.get(columnLabel.indexOf(targetLabels)).equals(""))){
           value.replace(targetLabels, value.get(targetLabels), value.get(targetLabels) + 1);
@@ -147,11 +153,11 @@ public class GroupBy implements BasicSchema{
       }
     }
   }
-  private void average(Row row, List<String> columnLabel,  HashMap<String, Object> group){
+  private void average(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_avg!=null){
 
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_avg");
-      List<String> rowList = row.toList();
+      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
       for(String targetLabels : _avg){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -161,10 +167,10 @@ public class GroupBy implements BasicSchema{
       }
     }
   }
-  private void maximum(Row row, List<String> columnLabel, HashMap<String, Object> group){
+  private void maximum(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_max!=null){
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_max");
-      List<String> rowList = row.toList();
+      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
       for(String targetLabels : _max){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -176,10 +182,10 @@ public class GroupBy implements BasicSchema{
       }
     }
   }
-  private void minimum(Row row, List<String> columnLabel,  HashMap<String, Object> group){
+  private void minimum(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_min!=null){
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_min");
-      List<String> rowList = row.toList();
+      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
       for(String targetLabels : _min){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -191,10 +197,10 @@ public class GroupBy implements BasicSchema{
       }
     }
   }
-  private void sum(Row row, List<String> columnLabel,  HashMap<String, Object> group){
+  private void sum(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_sum!=null){
       HashMap<String,Double> value =  (HashMap<String,Double>) group.get("_sum");
-      List<String> rowList = row.toList();
+      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
       for(String targetLabels : _sum){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -226,30 +232,32 @@ public class GroupBy implements BasicSchema{
     return null;
   } */
 
-  private void handleRow(HashMap<Set<String>, Integer> groupWorkforce, HashMap<Set<String>, HashMap<String, Object>> groups, Row row,  List<String> columnLabel, LinkedHashMap<String, String> columns) throws ColumnNotExistsException{
-    List<String> values = row.toList();
+  private synchronized void handleRow(Row row, HashMap<String, String> machineRow) throws ColumnNotExistsException{
     boolean valid = true;
-    if(where!=null){
-      for(String targetColumn : where.keySet()){
-        if(valid){
-          Filter UserFilter = where.get(targetColumn);
-          String value = values.get(columnLabel.indexOf(targetColumn));
-					valid = (!value.equals("") ? valid && UserFilter.evaluate(value, columns.get(targetColumn)) : false);
+    if(row != null) {
+      List<String> values = row.toList();
+      if (where != null) {
+        for (String targetColumn : where.keySet()) {
+          if (valid) {
+            Filter UserFilter = where.get(targetColumn);
+            String value = values.get(columnLabel.indexOf(targetColumn));
+            valid = (!value.equals("") ? valid && UserFilter.evaluate(value, columns.get(targetColumn)) : false);
+          }
         }
       }
     }
     if(valid){
-      Set<String> groupName = createKey(row, columnLabel);
+      Set<String> groupName = createKey(row);
       if(!groups.keySet().contains(groupName)){
-        groups.put(groupName, createGroup(row, columnLabel, columns));
+        groups.put(groupName, createGroup(row, columns));
         groupWorkforce.put(groupName, 1);
       }
       HashMap<String, Object> group = groups.get(groupName);
-      count(row, columnLabel, group);
-      average(row, columnLabel, group);
-      maximum(row, columnLabel, group);
-      minimum(row, columnLabel, group);
-      sum(row, columnLabel, group);
+      count(row, machineRow, group);
+      average(row, machineRow, group);
+      maximum(row, machineRow, group);
+      minimum(row, machineRow, group);
+      sum(row, machineRow, group);
       groupWorkforce.put(groupName,groupWorkforce.get(groupName) + 1);
       if(limit != -1){
         limit = limit - 1;
@@ -257,22 +265,59 @@ public class GroupBy implements BasicSchema{
     }
   }
 
-  public Collection<HashMap<String, Object>> run(Table table) throws ColumnNotExistsException, InvalidSelectRequestException {
-    if(select==null){
-      select = table.getColumns().keySet(); 
-    }
-    HashMap<Set<String>, Integer> groupWorkforce = new HashMap<>();
-    HashMap<Set<String>, HashMap<String, Object>> groups = new HashMap<>();
-    List<String> columnLabel = new ArrayList<String>(table.getColumns().keySet());
-    List<HashMap<String, Object>> res = new ArrayList<>();
+  public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      handleRow(groupWorkforce, groups, row, columnLabel, table.getColumns());
+      handleRow(row, null);
       if(limit == 0){
         break;
       }
     }
-    calculateAverage(groupWorkforce, groups);
+  }
+
+  @Override
+  public Object getRes() {
+    calculateAverage(groups);
     return applyHaving(groups.values());
+  }
+
+  @Override
+  public void setRequest(Table table, boolean fromClient) throws Exception {
+    this.table = table;
+    this.columnLabel = new ArrayList<String>(table.getColumns().keySet());
+    if(select==null){
+      select = table.getColumns().keySet();
+    }
+    groupWorkforce = new HashMap<>();
+    groups = new HashMap<>();
+    columns = table.getColumns();
+  }
+
+  @Override
+  public int getLimit() {
+    return -1;
+  }
+
+  @Override
+  public boolean hasSelect() {
+    return select != null;
+  }
+
+  @Override
+  public boolean hasWhere() {
+    return where != null;
+  }
+
+  @Override
+  public void addLines(Object lines) throws Exception {
+    if(limit == 0){
+      return;
+    }
+    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
+      handleRow(null, row);
+      if(limit == 0){
+        break;
+      }
+    }
   }
 }
