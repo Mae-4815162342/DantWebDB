@@ -88,7 +88,7 @@ public class CreationInsertionTest {
   @Test
   public void t3_InsertFile() throws IOException {
     MultipartFormDataOutput form = new MultipartFormDataOutput();
-    File csv = new File("/Users/diez/Documents/Fac/DantWebDB/titanic.csv");
+    File csv = new File(FilesPath.TITANIC_PATH);
     form.addFormData("tableName", "titanic", MediaType.TEXT_PLAIN_TYPE);
     form.addFormData("file", csv, MediaType.APPLICATION_OCTET_STREAM_TYPE);
     Response response = target

@@ -51,7 +51,7 @@ public class SelectFindTest {
           .post(Entity.entity(input, MediaType.APPLICATION_JSON));
     if(!response.readEntity(String.class).equals("titanic2 already exists in the database !")){
       MultipartFormDataOutput form = new MultipartFormDataOutput();
-      File csv = new File("/Users/diez/Documents/Fac/DantWebDB/titanic.csv");
+      File csv = new File(FilesPath.TITANIC_PATH);
       form.addFormData("tableName", "titanic2", MediaType.TEXT_PLAIN_TYPE);
       form.addFormData("file", csv, MediaType.APPLICATION_OCTET_STREAM_TYPE);
       target

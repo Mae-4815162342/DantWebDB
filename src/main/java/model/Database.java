@@ -95,7 +95,7 @@ public class Database {
             case "Aggregate":
                 select = gson.fromJson(jsonStr, Aggregate.class);
                 break;
-            case "GroupBy":
+            case "groupBy":
                 select = gson.fromJson(jsonStr, GroupBy.class);
                 break;
             default:
