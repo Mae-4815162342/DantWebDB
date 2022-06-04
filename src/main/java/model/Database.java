@@ -6,6 +6,7 @@ import model.requests.BasicSchema;
 import model.requests.FindManySelect;
 import model.requests.FindUniqueSelect;
 import model.requests.GroupBy;
+import model.requests.SelectSchema;
 
 import java.util.*;
 
@@ -83,8 +84,7 @@ public class Database {
     }
 
     public Object select(String jsonStr, String type, String tableName) throws Exception {
-        Table table = this.getTableByName(tableName);
-        BasicSchema select;
+        SelectSchema select;
         switch(type){
             case "findUnique":
                 select = gson.fromJson(jsonStr, FindUniqueSelect.class);
@@ -102,7 +102,8 @@ public class Database {
                 return null;
         }
         try {
-            Object res = select.run(table);
+            select.run();
+            Object res = select.getRes();
             return res;
         } catch (Exception e) {
             throw e;
