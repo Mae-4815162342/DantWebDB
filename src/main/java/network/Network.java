@@ -24,7 +24,7 @@ public class Network {
     private ArrayList<String> peersIPAdressesList;
     private static Network instance;
     private ResteasyClient client;
-    private static String baseURI = "http://{ipAddress}:8080/api";
+    private static String baseURI = "http://{ipAddress}:8081/api";
     private static AtomicInteger nextPeer = new AtomicInteger(0);
 
     private Network() {

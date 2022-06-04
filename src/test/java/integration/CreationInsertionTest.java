@@ -25,7 +25,7 @@ import filter.GsonProvider;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CreationInsertionTest {
   private ResteasyClient client;
-  private final String baseURI = "http://localhost:8080/api";
+  private final String baseURI = "http://localhost:8081/api";
   private ResteasyWebTarget target;
 
   @Before
@@ -46,6 +46,7 @@ public class CreationInsertionTest {
         .path("/get")
         .queryParam("table", table)
         .queryParam("type", type)
+.queryParam("fromClient", true)
         .request()
         .method("get", Entity.entity(body, MediaType.APPLICATION_JSON));
     return response.readEntity(String.class);
