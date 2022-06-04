@@ -28,7 +28,7 @@ import filter.GsonProvider;
 
 public class GroupByTest {
   private ResteasyClient client;
-  private final String baseURI = "http://localhost:8080/api";
+  private final String baseURI = "http://localhost:8081/api";
   private ResteasyWebTarget target;
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
