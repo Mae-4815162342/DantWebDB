@@ -89,7 +89,7 @@ public class CreationInsertionTest {
   @Test
   public void t3_InsertFile() throws IOException {
     MultipartFormDataOutput form = new MultipartFormDataOutput();
-    File csv = new File(FilesPath.TITANIC_PATH);
+    File csv = new File(Utils.TITANIC_PATH);
     form.addFormData("tableName", "titanic", MediaType.TEXT_PLAIN_TYPE);
     form.addFormData("file", csv, MediaType.APPLICATION_OCTET_STREAM_TYPE);
     Response response = target

@@ -17,6 +17,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static integration.Utils.sendGetRequest;
 
 import filter.GsonProvider;
 
@@ -40,7 +41,7 @@ public class AggregateTest {
           .post(Entity.entity(input, MediaType.APPLICATION_JSON));
     if(!response.readEntity(String.class).equals("titanic1 already exists in the database !")){
       MultipartFormDataOutput form = new MultipartFormDataOutput();
-      File csv = new File(FilesPath.TITANIC_PATH);
+      File csv = new File(Utils.TITANIC_PATH);
       form.addFormData("tableName", "titanic1", MediaType.TEXT_PLAIN_TYPE);
       form.addFormData("file", csv, MediaType.APPLICATION_OCTET_STREAM_TYPE);
       target
@@ -55,21 +56,9 @@ public class AggregateTest {
     this.client.close();
   }
 
-  public String sendGetRequest(String body, String table, String type) {
-
-    Response response = target
-        .path("/get")
-        .queryParam("table", table)
-        .queryParam("type", type)
-.queryParam("fromClient", true)
-        .request()
-        .method("get", Entity.entity(body, MediaType.APPLICATION_JSON));
-    return response.readEntity(String.class);
-  }
-
   @Test
   public void AggregateCount() throws IOException {
-    String actual = sendGetRequest("{\n  \"_count\": [\n    \"Cabin\", \"Age\", \"_all\"\n  ]\n}", "titanic1",
+    String actual = sendGetRequest(target, "{\n  \"_count\": [\n    \"Cabin\", \"Age\", \"_all\"\n  ]\n}", "titanic1",
         "Aggregate");
     String expected = "{\"_count\":{\"Cabin\":204.0,\"Age\":714.0,\"_all\":891.0}}";
     assertEquals(expected, actual);
@@ -77,28 +66,28 @@ public class AggregateTest {
 
   @Test
   public void AggregateSum() throws IOException {
-    String actual = sendGetRequest("{\n  \"_sum\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
+    String actual = sendGetRequest(target, "{\n  \"_sum\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
     String expected = "{\"_sum\":{\"PassengerId\":397386.0,\"Age\":21205.17}}";
     assertEquals(expected, actual);
   }
 
   @Test
   public void AggregateAvg() throws IOException {
-    String actual = sendGetRequest("{\n  \"_avg\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
+    String actual = sendGetRequest(target, "{\n  \"_avg\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
     String expected = "{\"_avg\":{\"PassengerId\":446.0,\"Age\":23.8}}";
     assertEquals(expected, actual);
   }
 
   @Test
   public void AggregateMax() throws IOException {
-    String actual = sendGetRequest("{\n  \"_max\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
+    String actual = sendGetRequest(target, "{\n  \"_max\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
     String expected = "{\"_max\":{\"PassengerId\":891.0,\"Age\":80.0}}";
     assertEquals(expected, actual);
   }
 
   @Test
   public void AggregateMin() throws IOException {
-    String actual = sendGetRequest("{\n  \"_min\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
+    String actual = sendGetRequest(target, "{\n  \"_min\": [\n    \"Age\", \"PassengerId\"\n  ]\n}", "titanic1", "Aggregate");
     String expected = "{\"_min\":{\"PassengerId\":0.0,\"Age\":0.0}}";
     assertEquals(expected, actual);
   }

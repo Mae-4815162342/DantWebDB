@@ -11,7 +11,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.MediaType;
-import integration.Utils;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -19,16 +18,17 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import filter.GsonProvider;
 
-public class GroupByTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TaxiRequests {
   private ResteasyClient client;
   private final String baseURI = "http://localhost:8081/api";
   private ResteasyWebTarget target;
@@ -39,7 +39,7 @@ public class GroupByTest {
     this.client = new ResteasyClientBuilder().build();
     this.client.register(GsonProvider.class);
     this.target = client.target(UriBuilder.fromPath(baseURI));
-    String input = "{\n  \"tableName\": \"titanic4\",\n  \"columns\":{\n    \"PassengerId\": \"int\",\n    \"Survived\": \"string\",\n        \"Pclass\": \"string\",\n        \"Name\": \"string\",\n        \"Sex\": \"string\",\n        \"Age\": \"int\",\n        \"SibSp\": \"string\",\n        \"Parch\": \"string\",\n        \"Ticket\": \"string\",\n        \"Fare\": \"string\",\n        \"Cabin\": \"string\",\n        \"Embarked\": \"string\"\n  }\n}";
+    String input = formatJSON(gson, "{\"tableName\":\"taxi\",\"columns\":{\"VendorID\":\"int\",\"tpep_pickup_datetime\":\"string\",\"tpep_dropoff_datetime\":\"string\",\"passenger_count\":\"int\",\"trip_distance\":\"string\",\"RatecodeID\":\"string\",\"store_and_fwd_flag\":\"string\",\"PULocationID\":\"int\",\"DOLocationID\":\"int\",\"payment_type\":\"string\",\"fare_amount\":\"string\",\"extra\":\"int\",\"mta_tax\":\"string\",\"tip_amount\":\"int\",\"tolls_amount\":\"string\",\"improvement_surcharge\":\"string\",\"total_amount\":\"string\",\"congestion_surcharge\":\"string\"}}");
     System.out.println("• Sending post request to localhost");
   
     Response response = target
@@ -47,10 +47,10 @@ public class GroupByTest {
           .queryParam("fromClient", true)
           .request()
           .post(Entity.entity(input, MediaType.APPLICATION_JSON));
-    if(!response.readEntity(String.class).equals("titanic4 already exists in the database !")){
+    if(!response.readEntity(String.class).equals("taxi already exists in the database !")){
       MultipartFormDataOutput form = new MultipartFormDataOutput();
-      File csv = new File(Utils.TITANIC_PATH);
-      form.addFormData("tableName", "titanic4", MediaType.TEXT_PLAIN_TYPE);
+      File csv = new File(Utils.TAXI_PATH);
+      form.addFormData("tableName", "taxi", MediaType.TEXT_PLAIN_TYPE);
       form.addFormData("file", csv, MediaType.APPLICATION_OCTET_STREAM_TYPE);
       target
           .path("/upload")
@@ -63,18 +63,20 @@ public class GroupByTest {
   public void teardown() {
     this.client.close();
   }
-
+  @Test 
+  public void A_ResetTimer(){
+    assertEquals(true, true);
+  }
   @Test
-  public void groupBy() throws IOException {
-    String actual = sendGetRequest(target, formatJSON(gson, "{\"by\":[\"Sex\",\"Survived\"],\"_count\":[\"_all\"]}"), "titanic4", "groupBy");
-    String expected = "[{\"Survived\":\"0\",\"_count\":{\"_all\":81.0},\"Sex\":\"female\"},{\"Survived\":\"1\",\"_count\":{\"_all\":233.0},\"Sex\":\"female\"},{\"Survived\":\"1\",\"_count\":{\"_all\":109.0},\"Sex\":\"male\"},{\"Survived\":\"0\",\"_count\":{\"_all\":468.0},\"Sex\":\"male\"}]";
+  public void Request2(){
+    int actual = sendGetRequest(target, formatJSON(gson, "{\"limit\":1000}"), "taxi", "findMany").length();
+    int expected = 509998;
     assertEquals(expected, actual);
   }
-
   @Test
-  public void groupByWithHaving() throws IOException {
-    String actual = sendGetRequest(target, formatJSON(gson, "{\"by\":[\"Sex\",\"Survived\"],\"_count\":[\"_all\"],\"having\":{\"_count\":{\"_all\":{\"gt\":150}}}}"), "titanic4", "groupBy");
-    String expected = "[{\"Survived\":\"1\",\"_count\":{\"_all\":233.0},\"Sex\":\"female\"},{\"Survived\":\"0\",\"_count\":{\"_all\":468.0},\"Sex\":\"male\"}]";
+  public void Request4(){
+    int actual = sendGetRequest(target, formatJSON(gson, "{\"by\":[\"trip_distance\",\"tpep_pickup_datetime\"],\"limit\":1000}"), "taxi", "groupBy").length();
+    int expected = 79434;
     assertEquals(expected, actual);
   }
 }
