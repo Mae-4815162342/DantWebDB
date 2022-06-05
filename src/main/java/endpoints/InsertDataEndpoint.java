@@ -71,24 +71,26 @@ public class InsertDataEndpoint {
         try {
             String line;
             while ((line = buffer.readLine()) != null) {
-                if(j != MAX_LINES){
-                    i++;
-                    if(i % (NB_PEERS + 1) == 0){
-                        Worker.getInstance().insertIntoTable(tableName, line);
+                if(!line.equals("")){
+                    if(j != MAX_LINES){
+                        i++;
+                        if(i % (NB_PEERS + 1) == 0){
+                            Worker.getInstance().insertIntoTable(tableName, line);
+                        }
+                        else{
+                            queue.offer(line);
+                            j++;
+                        }
                     }
                     else{
-                        queue.offer(line);
-                        j++;
+                        executorService.submit(pollTask);
+                        while(!queue.isEmpty()){
+        
+                        }
+                        j = 0;
+                        queue.clear();
                     }
-                }
-                else{
-                    executorService.submit(pollTask);
-                    while(!queue.isEmpty()){
-    
-                    }
-                    j = 0;
-                    queue.clear();
-                }
+                } 
             }
             if(j!=0){
                 executorService.submit(pollTask);
