@@ -37,7 +37,7 @@ public class GroupBy implements SelectSchema {
 
   private Set<String> createKey(Row row, HashMap<String, String> machineRow) throws ColumnNotExistsException{
     Set<String> res = new HashSet<>();
-    List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
+    List<String> rowList = row != null ? row.toList() : new ArrayList<>(machineRow.values());
     for(String groupElement : by){
       res.add(rowList.get(columnLabel.indexOf(groupElement)));
     }
@@ -62,7 +62,7 @@ public class GroupBy implements SelectSchema {
   }
   private HashMap<String, Object> createGroup(Row row, HashMap<String, String> machineRow) throws ColumnNotExistsException{
     HashMap<String, Object> res = new HashMap<>();
-    List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
+    List<String> rowList = row != null ? row.toList() : new ArrayList<>(machineRow.values());
     for(String groupElement : by){
       res.put(groupElement, rowList.get(columnLabel.indexOf(groupElement)));
     }
@@ -145,7 +145,7 @@ public class GroupBy implements SelectSchema {
   private void count(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_count!=null){
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_count");
-      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
+      List<String> rowList = row != null ? row.toList() : new ArrayList<>(machineRow.values());
       for(String targetLabels : _count){
         if(targetLabels.equals("_all")|| (!targetLabels.equals("_all") && !rowList.get(columnLabel.indexOf(targetLabels)).equals(""))){
           value.replace(targetLabels, value.get(targetLabels), value.get(targetLabels) + 1);
@@ -157,7 +157,7 @@ public class GroupBy implements SelectSchema {
     if(_avg!=null){
 
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_avg");
-      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
+      List<String> rowList = row != null ? row.toList() : new ArrayList<>(machineRow.values());
       for(String targetLabels : _avg){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -170,7 +170,7 @@ public class GroupBy implements SelectSchema {
   private void maximum(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_max!=null){
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_max");
-      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
+      List<String> rowList = row != null ? row.toList() : new ArrayList<>(machineRow.values());
       for(String targetLabels : _max){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -185,7 +185,7 @@ public class GroupBy implements SelectSchema {
   private void minimum(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_min!=null){
       HashMap<String,Double> value = (HashMap<String,Double>) group.get("_min");
-      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
+      List<String> rowList = row != null ? row.toList() : new ArrayList<>(machineRow.values());
       for(String targetLabels : _min){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -200,7 +200,7 @@ public class GroupBy implements SelectSchema {
   private void sum(Row row, HashMap<String, String> machineRow, HashMap<String, Object> group){
     if(_sum!=null){
       HashMap<String,Double> value =  (HashMap<String,Double>) group.get("_sum");
-      List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
+      List<String> rowList = row != null ? row.toList() : new ArrayList<>(machineRow.values());
       for(String targetLabels : _sum){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
