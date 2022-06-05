@@ -31,7 +31,7 @@ public class TableTree {
 
     public void insertEntry(String line) {
         String[]tokens = line.split(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)*(?=(?:[^;]*\"[^;]*\")*[^;]*$)");
-
+        String[] row= new String[tokens.length];
 
         int len= rows.size()-1;
         int clen=columns.size();
@@ -42,12 +42,15 @@ public class TableTree {
 
         //System.out.println(len);
         for(int i=0;i<columns.size();i++){
-            values.get(i).insert(tokens[i],len);
+            row[i]=values.get(i).insert(tokens[i],len);
             //System.out.println(len+" "+tokens[i]+" inserted ");
 
         }
-        rows.add(tokens);
+        rows.add(row);
         //System.out.println(len);
+        if(len==1000000){
+            System.out.println(len);
+        }
     }
 
     public int getTableSize() {
