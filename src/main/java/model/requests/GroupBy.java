@@ -35,9 +35,9 @@ public class GroupBy implements SelectSchema {
   private HashMap<Set<String>, Integer> groupWorkforce;
   private HashMap<Set<String>, HashMap<String, Object>> groups;
 
-  private Set<String> createKey(Row row) throws ColumnNotExistsException{
+  private Set<String> createKey(Row row, HashMap<String, String> machineRow) throws ColumnNotExistsException{
     Set<String> res = new HashSet<>();
-    List<String> rowList = row.toList();
+    List<String> rowList = row != null ? row.toList() : (List<String>) machineRow.values();
     for(String groupElement : by){
       res.add(rowList.get(columnLabel.indexOf(groupElement)));
     }
@@ -247,7 +247,7 @@ public class GroupBy implements SelectSchema {
       }
     }
     if(valid){
-      Set<String> groupName = createKey(row);
+      Set<String> groupName = createKey(row, machineRow);
       if(!groups.keySet().contains(groupName)){
         groups.put(groupName, createGroup(row, columns));
         groupWorkforce.put(groupName, 1);
