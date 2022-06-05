@@ -96,7 +96,7 @@ public class SelectEndpoint {
               try {
                 worker.select();
               }catch (Exception e) {
-                throw new SelectException(jsonStr);
+                throw new SelectException(e.getMessage());
               }
               return null;
             }
@@ -117,7 +117,7 @@ public class SelectEndpoint {
       executorService.shutdown();
 
     }catch (Exception e) {
-      throw new SelectException(jsonStr);
+      throw new SelectException(e.getMessage());
     }
     return worker.getRes();
   }

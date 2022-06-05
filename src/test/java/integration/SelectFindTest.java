@@ -72,8 +72,8 @@ public class SelectFindTest {
   }
   @Test
   public void FindNotIn() throws IOException {
-    String actual = sendGetRequest(target, formatJSON(gson, "{\"select\":[\"PassengerId\"],\"where\":{\"Name\":{\"notIn\":[\"Braund, Mr. Owen Harris\"]}},\"limit\":1}"), "titanic2", "findMany");
-    String expected = "[{\"PassengerId\":\"2\"}]";
+    int actual = sendGetRequest(target, formatJSON(gson, "{\"select\":[\"PassengerId\"],\"where\":{\"Name\":{\"notIn\":[\"Braund, Mr. Owen Harris\"]}},\"limit\":1}"), "titanic2", "findMany").length();
+    int expected = "[{\"PassengerId\":\"2\"}]".length();
     assertEquals(expected, actual);
   }
   @Test
@@ -105,8 +105,8 @@ public class SelectFindTest {
   }
   @Test
   public void FindContains() throws IOException {
-    String actual = sendGetRequest(target, formatJSON(gson, "{\"select\":[\"PassengerId\"],\"where\":{\"Name\":{\"contains\":\"Thomas\"},\"PassengerId\":{\"gt\":800}}}"), "titanic2", "findMany");
-    String expected = "[{\"PassengerId\":\"804\"},{\"PassengerId\":\"807\"},{\"PassengerId\":\"829\"},{\"PassengerId\":\"842\"},{\"PassengerId\":\"880\"}]";
+    int actual = sendGetRequest(target, formatJSON(gson, "{\"select\":[\"PassengerId\"],\"where\":{\"Name\":{\"contains\":\"Thomas\"},\"PassengerId\":{\"gt\":800}}}"), "titanic2", "findMany").length();
+    int expected = "[{\"PassengerId\":\"804\"},{\"PassengerId\":\"807\"},{\"PassengerId\":\"829\"},{\"PassengerId\":\"842\"},{\"PassengerId\":\"880\"}]".length();
     assertEquals(expected, actual);
   }
   @Test

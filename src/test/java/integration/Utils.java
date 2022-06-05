@@ -20,7 +20,7 @@ public class Utils {
         .path("/get")
         .queryParam("table", table)
         .queryParam("type", type)
-.queryParam("fromClient", true)
+        .queryParam("fromClient", true)
         .request()
         .method("get", Entity.entity(body, MediaType.APPLICATION_JSON));
     return response.readEntity(String.class);
