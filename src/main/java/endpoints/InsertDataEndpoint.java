@@ -47,7 +47,8 @@ public class InsertDataEndpoint {
         ExecutorService executorService = Executors.newFixedThreadPool(NB_PEERS + 1);
         ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
 		AtomicInteger NB_LINES = new AtomicInteger();
-        Table table = Worker.getInstance().getTableByName(tableName);
+        //Table table = Worker.getInstance().getTableByName(tableName);
+        Table table=null;
         System.out.println("Running async offer task...");
         buffer.readLine();
         buffer.readLine();
@@ -89,6 +90,7 @@ public class InsertDataEndpoint {
                     }
                     j = 0;
                     queue.clear();
+                    System.out.println("Number of rows :"+Worker.getInstance().getSize(tableName));
                 }
             }
             if(j!=0){
@@ -97,6 +99,7 @@ public class InsertDataEndpoint {
 
                 }
                 queue.clear();
+                System.out.println("Number of rows :"+Worker.getInstance().getSize(tableName));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,6 +108,11 @@ public class InsertDataEndpoint {
         executorService.shutdown();
         inputStream.close();
         buffer.close();
+        long heapSize = Runtime.getRuntime().totalMemory();
+        long heapFreeSize = Runtime.getRuntime().freeMemory();
+        System.out.println("heap size :"+heapSize);
+        System.out.println("heap free size :"+heapFreeSize);
+        System.out.println("heap occupied :"+ (heapSize-heapFreeSize));
     }
 
     @POST

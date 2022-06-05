@@ -15,6 +15,7 @@ import exception.InvalidSelectRequestException;
 import jdk.nio.Channels;
 import model.Row;
 import model.Table;
+import model.TableTree;
 import model.requests.filters_operators.Filter;
 
 public class GroupBy implements SelectSchema {
@@ -29,7 +30,7 @@ public class GroupBy implements SelectSchema {
   private Set<String> _max;
   private Set<String> _sum;
   private Set<String> _min;
-  private Table table;
+  private TableTree table;
   private List<String> columnLabel;
   private LinkedHashMap<String, String> columns;
   private HashMap<Set<String>, Integer> groupWorkforce;
@@ -266,13 +267,13 @@ public class GroupBy implements SelectSchema {
   }
 
   public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
-    List<Row> lines = table.getLines().selectAll();
+    /*List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
       handleRow(row, null);
       if(limit == 0){
         break;
       }
-    }
+    }*/
   }
 
   @Override
@@ -282,7 +283,7 @@ public class GroupBy implements SelectSchema {
   }
 
   @Override
-  public void setRequest(Table table, boolean fromClient) throws Exception {
+  public void setRequest(TableTree table, boolean fromClient) throws Exception {
     this.table = table;
     this.columnLabel = new ArrayList<String>(table.getColumns().keySet());
     if(select==null){

@@ -9,11 +9,12 @@ import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
 import model.Row;
 import model.Table;
+import model.TableTree;
 
 public class FindUniqueSelect implements SelectSchema{
   private HashMap<String, Boolean> select;
   private HashMap<String, String> where;
-  private Table table;
+  private TableTree table;
   private List<String> columnLabel;
   private HashMap<String,String> result;
   private Set<String> selectedLabels;
@@ -42,11 +43,11 @@ public class FindUniqueSelect implements SelectSchema{
   }
   
   public void run() throws ColumnNotExistsException {
-    List<Row> lines = table.getLines().selectAll();
+    /*List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
       handleRow(row, null);
       if(result != null) break;
-    }
+    }*/
   }
 
   @Override
@@ -55,7 +56,7 @@ public class FindUniqueSelect implements SelectSchema{
   }
 
   @Override
-  public void setRequest(Table table, boolean fromClient) throws Exception {
+  public void setRequest(TableTree table, boolean fromClient) throws Exception {
     this.table = table;
     if(where==null){
       throw new InvalidSelectRequestException();

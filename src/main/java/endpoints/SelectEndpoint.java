@@ -46,7 +46,7 @@ public class SelectEndpoint {
       if((!worker.reqHasWhere() && !worker.reqIsGroupBy() &&!worker.reqIsAggregate() && worker.reqLimit() < tableSize && worker.reqLimit() > 0)) {
         Worker.getInstance().select();
         res = Worker.getInstance().getRes();
-        //else all the nodes need to process the request
+        //else all the nodes need to process the requestq
       } else {
         System.out.println("Sending to all");
         res = selectRequestToAll(worker, jsonStr, tableName, type);

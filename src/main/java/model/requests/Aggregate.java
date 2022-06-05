@@ -12,6 +12,7 @@ import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
 import model.Row;
 import model.Table;
+import model.TableTree;
 import model.requests.filters_operators.Filter;
 
 public class Aggregate implements SelectSchema{
@@ -25,7 +26,7 @@ public class Aggregate implements SelectSchema{
   private Set<String> _sum;
   private Set<String> _min;
   private int average_total = 0;
-  private Table table;
+  private TableTree table;
   private boolean fromClient;
   private List<String> columnLabel;
   private LinkedHashMap<String, String> columns;
@@ -239,13 +240,13 @@ public class Aggregate implements SelectSchema{
   }
 
   public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
-    List<Row> lines = table.getLines().selectAll();
+    /*List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
       handleRow(row, null);
       if(limit == 0){
         break;
       }
-    }
+    }*/
   }
 
   @Override
@@ -255,7 +256,7 @@ public class Aggregate implements SelectSchema{
   }
 
   @Override
-  public void setRequest(Table table, boolean fromClient) throws Exception {
+  public void setRequest(TableTree table, boolean fromClient) throws Exception {
     this.table = table;
     this.fromClient = fromClient;
     if(select==null){

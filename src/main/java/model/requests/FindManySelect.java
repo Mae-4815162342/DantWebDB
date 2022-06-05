@@ -11,6 +11,7 @@ import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
 import model.Row;
 import model.Table;
+import model.TableTree;
 import model.requests.filters_operators.Filter;
 
 public class FindManySelect implements SelectSchema {
@@ -20,10 +21,12 @@ public class FindManySelect implements SelectSchema {
   private HashMap<String, String> orderBy;
   private String groupBy;
   private List<HashMap<String,String>> result;
-  private Table table;
+  private TableTree table;
   private List<String> columnLabel;
   private LinkedHashMap<String, String> columns;
   private boolean fromClient;
+
+  private String resultString;
   
   private synchronized void handleRow(Row row, HashMap<String, String> rowFromMachine){
     if(row != null) {
@@ -80,18 +83,21 @@ public class FindManySelect implements SelectSchema {
   }
 
   public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
-    List<Row> lines = table.getLines().selectAll();
+    /*List<Row> lines = table.getLines().selectAll();
     for (Row row : lines) {
       handleRow(row, null);
       if (limit == 0) {
         break;
       }
-    }
+    }*/
+    System.out.println("findMany run");
+    String res=table.getall();
+    this.resultString=res;
   }
 
   @Override
-  public void setRequest(Table table, boolean fromClient) throws Exception{
-    this.table = table;
+  public void setRequest(TableTree tableTree, boolean fromClient) throws Exception{
+    this.table = tableTree;
     this.fromClient = fromClient;
     if (select == null) {
       select = table.getColumns().keySet();
@@ -133,6 +139,7 @@ public class FindManySelect implements SelectSchema {
     if(orderBy!=null && fromClient){
       orderResult(result, table.getColumns());
     }
-    return result;
+    //return result;
+    return resultString;
   }
 }

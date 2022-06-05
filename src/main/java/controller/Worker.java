@@ -7,6 +7,7 @@ import exception.UnknownTypeOfSelect;
 import model.Database;
 import model.Row;
 import model.Table;
+import model.TableTree;
 import model.requests.*;
 
 import javax.lang.model.type.UnknownTypeException;
@@ -35,8 +36,15 @@ public class Worker {
         database.addTable(name, columns);
     }
 
-    public static Table getTableByName(String name) throws TableNotExistsException {
+    public static TableTree getTableByName(String name) throws TableNotExistsException {
         return database.getTableByName(name);
+    }
+
+    public static void createTable(TableTree input) throws TableExistsException{
+        if(input==null){
+            System.out.println("NULLLLL");
+        }
+        database.addTable(input);
     }
 
     public void insertIntoTable(String tableName, String entry) throws TableNotExistsException {
@@ -55,8 +63,12 @@ public class Worker {
         return database.getColumns(table);
     }
 
+    public int getSize(String table) throws TableNotExistsException {
+        return database.getSize(table);
+    }
+
     public void setRequest(String jsonStr, String type, String tableName, boolean fromClient) throws Exception {
-        Table table = database.getTableByName(tableName);
+        TableTree table = database.getTableByName(tableName);
         if(fromClient) {
             switch (type) {
                 case "findUnique":
