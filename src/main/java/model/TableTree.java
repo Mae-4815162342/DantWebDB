@@ -9,6 +9,7 @@ public class TableTree {
     private String tableName;
     private ArrayList<String[]> rows;
     private LinkedHashMap<String, String> columns;
+    private int len=0;
     private ArrayList<ColumnTree> values;
 
 
@@ -33,7 +34,7 @@ public class TableTree {
         String[]tokens = line.split(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)*(?=(?:[^;]*\"[^;]*\")*[^;]*$)");
         String[] row= new String[tokens.length];
 
-        int len= rows.size()-1;
+        //int len= rows.size()-1;
         int clen=columns.size();
         /*IntStream.range(0, clen).parallel().forEach(i -> {
             values.get(i).insert(tokens[i],len);
@@ -46,6 +47,7 @@ public class TableTree {
             //System.out.println(len+" "+tokens[i]+" inserted ");
 
         }
+        //this.len++;
         rows.add(row);
         //System.out.println(len);
         if(len==1000000){
