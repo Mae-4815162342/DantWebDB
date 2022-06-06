@@ -36,8 +36,8 @@ public class ColumnTree {
         /*if(l==null){
             s=e;
         }*/
-        l=IndexList.addElement(row,l);
-        valuelist.put(e,l);
+        //l=IndexList.addElement(row,l);
+        valuelist.put(e,new IndexList(row));
         return e;
 
     }

@@ -19,6 +19,7 @@ model\RowTree.class
 endpoints\TableEndpoint2.class
 exception\WrongGroupBy.class
 filter\GsonProvider.class
+model\StringNode.class
 exception\UnknownTypeOfSelect.class
 model\requests\FindManySelect$1.class
 model\requests\Update.class
@@ -27,6 +28,7 @@ network\Network$1.class
 controller\Worker.class
 model\requests\GroupBy.class
 app\App.class
+model\Tree.class
 model\requests\filters_operators\OR.class
 exception\InvalidUpdateRequestException.class
 model\ColumnTree.class
@@ -40,6 +42,7 @@ storage\RowStorage.class
 model\requests\FindUniqueSelect.class
 exception\TableNotExistsException.class
 exception\ColumnNotExistsException.class
+model\NodeTree.class
 exception\TableExistsException.class
 model\requests\FindManySelect.class
 model\requests\filters_operators\Operator.class
