@@ -68,7 +68,7 @@ public class Worker {
                 case "groupBy":
                     currentSelect = gson.fromJson(jsonStr, GroupBy.class);
                     break;
-                case "aggregate":
+                case "Aggregate":
                     currentSelect = gson.fromJson(jsonStr, Aggregate.class);
                     break;
                 default:
