@@ -103,7 +103,7 @@ public class Aggregate implements SelectSchema{
       if(row != null) {
         rowList = row.toList();
       } else {
-        rowList = (List<String>) machineRow.values();
+        rowList = new ArrayList<>(machineRow.values());
       }
       for(String targetLabels : _count){
         if(targetLabels.equals("_all")|| (!targetLabels.equals("_all") && !rowList.get(columnLabel.indexOf(targetLabels)).equals(""))){
@@ -120,7 +120,7 @@ public class Aggregate implements SelectSchema{
       if(row != null) {
         rowList = row.toList();
       } else {
-        rowList = (List<String>) machineRow.values();
+        rowList = new ArrayList<>(machineRow.values());
       }
       for(String targetLabels : _avg){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
@@ -138,7 +138,7 @@ public class Aggregate implements SelectSchema{
       if(row != null) {
         rowList = row.toList();
       } else {
-        rowList = (List<String>) machineRow.values();
+        rowList = new ArrayList<>(machineRow.values());
       }
       for(String targetLabels : _max){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
@@ -159,7 +159,7 @@ public class Aggregate implements SelectSchema{
       if(row != null) {
         rowList = row.toList();
       } else {
-        rowList = (List<String>) machineRow.values();
+        rowList = new ArrayList<>(machineRow.values());
       }
       for(String targetLabels : _min){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
@@ -179,7 +179,7 @@ public class Aggregate implements SelectSchema{
       if(row != null) {
         rowList = row.toList();
       } else {
-        rowList = (List<String>) machineRow.values();
+        rowList = new ArrayList<>(machineRow.values());
       }
       for(String targetLabels : _sum){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
@@ -283,11 +283,11 @@ public class Aggregate implements SelectSchema{
   }
 
   @Override
-  public void addLines(Object lines) {
+  public void addLines(List<HashMap<String, String>> lines) {
     if(limit == 0){
       return;
     }
-    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
+    for(HashMap<String, String> row : lines){
       handleRow(null, row);
       if(limit == 0){
         break;
