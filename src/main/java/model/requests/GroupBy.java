@@ -309,11 +309,11 @@ public class GroupBy implements SelectSchema {
   }
 
   @Override
-  public void addLines(List<HashMap<String, String>> lines) throws Exception {
+  public void addLines(Object lines) throws Exception {
     if(limit == 0){
       return;
     }
-    for(HashMap<String, String> row : lines){
+    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
       handleRow(null, row);
       if(limit == 0){
         break;

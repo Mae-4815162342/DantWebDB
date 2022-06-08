@@ -111,7 +111,7 @@ public class Worker {
         return currentSelect.getRes();
     }
 
-    public void addLinesToAnswer(List<HashMap<String, String>> lines) throws Exception{
+    public void addLinesToAnswer(Object lines) throws Exception{
         currentSelect.addLines(lines);
     }
 }

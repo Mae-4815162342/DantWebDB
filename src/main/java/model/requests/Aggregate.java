@@ -283,11 +283,11 @@ public class Aggregate implements SelectSchema{
   }
 
   @Override
-  public void addLines(List<HashMap<String, String>> lines) {
+  public void addLines(Object lines) {
     if(limit == 0){
       return;
     }
-    for(HashMap<String, String> row : lines){
+    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
       handleRow(null, row);
       if(limit == 0){
         break;
