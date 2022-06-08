@@ -10,7 +10,7 @@ public class FloatTreeList implements TreeList{
 
     @Override
     public FloatValue put_(String token, RowValue row) {
-        System.out.println("ICI c'est float");
+        //System.out.println("ICI c'est float");
         float v1=Float.parseFloat(token);
         if(token.equals("")){
             putnull(row);

@@ -10,7 +10,7 @@ public class StringTreeList implements TreeList{
     @Override
     public StringValue put_(String t, RowValue row) {
         //String v1=Float.parseFloat(token);
-        System.out.println("ICI c'est string");
+        //System.out.println("ICI c'est string");
         if(t.equals("")){
             putnull(row);
             return null;
@@ -18,23 +18,30 @@ public class StringTreeList implements TreeList{
 
         String token=t.toUpperCase();
         StringValue value;
-        int debut=0;
+        int debut=1;
         int fin= values.size()-1;
-        int i=0;
-        while(debut<fin){
-            i=debut+(fin-debut)/2;
+        int i=-1;
+        String v2;
+        if(fin==-1){
+            value=new StringValue(token,row);
+            values.add(value);
+            return value;
+        }
+        do{
+            i =  (debut + fin) / 2;
             value=values.get(i);
-            String v2=value.getValue();
-            int compare= token.compareTo(v2);
-            if(compare==0){
+            v2=value.getValue();
+            int compare= v2.compareTo(token);
+            if (compare==0) {
                 value.add(row);
                 return value;
-            }
-            if(compare>0){debut=i+1;}
-            else{fin=i-1;}
-
+            };
+            if  ( compare <0){ debut =  i + 1 ;}
+            else fin =  i-1 ;
         }
-        ///System.out.println("index-"+i+" champs: "+token);
+        while ( !( token.equals(v2) ) & ( debut <= fin ) );
+
+        System.out.println("index-"+i+" champs: "+token);
         value=new StringValue(token,row);
         values.add(i,value);
         return value;

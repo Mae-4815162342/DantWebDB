@@ -35,7 +35,9 @@ public class TableTree {
 
     public  void insertEntry(String line) {
         String[]tokens = line.split(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)*(?=(?:[^;]*\"[^;]*\")*[^;]*$)");
-
+       /* for(int i=0;i< tokens.length;i++){
+            System.out.println(tokens[i]);
+        }*/
         RowValue row= new RowValue();
         //RowTree row= new RowTree();
 
@@ -60,17 +62,22 @@ public class TableTree {
             //System.out.println(len+" "+tokens[i]+" inserted ");
         });*/
 
-
+        /*System.out.println(values.size());
+        System.out.println(tokens.length);
+        System.out.println();*/
         for(int i=0;i< tokens.length;i++){
-            System.out.println(tokens[i]);
-
+            //System.out.println(tokens[i]);
+            //row[i]=
+            //row.insert(values.get(i).put(tokens[i],row));
             values.get(i).put_(tokens[i],row);
+            //System.out.println(len+" "+tokens[i]+" inserted ");
 
         }
         for(int i= tokens.length;i<columns.size();i++){
-
+            //row[i]=
+            //row.insert(values.get(i).put(null,row));
             values.get(i).putnull(row);
-
+            //System.out.println(len+" "+tokens[i]+" inserted ");
 
         }
 
@@ -106,17 +113,17 @@ public class TableTree {
 
     public void initializeColumn(){
         for(Map.Entry<String,String> c:this.columns.entrySet()){
-
+            System.out.println(c.getKey()+"   "+c.getValue());
             values.add(new StringTreeList());
-           if(c.getValue().equals("float")){
-               System.out.println(c.getKey()+"  FLOAT "+c.getValue());
+          /* if(c.getValue().equals("float")){
+               System.out.println(c.getKey()+"   "+c.getValue());
                 values.add(new FloatTreeList());}
             else if(c.getValue().equals("int")){
-               System.out.println(c.getKey()+" INT  "+c.getValue());
+               System.out.println(c.getKey()+"   "+c.getValue());
                 values.add(new IntTreeList());}
             else{
-               System.out.println(c.getKey()+" STRING  "+c.getValue());
-                values.add(new StringTreeList());}
+               System.out.println(c.getKey()+"   "+c.getValue());
+                values.add(new StringTreeList());}*/
         }
     }
 

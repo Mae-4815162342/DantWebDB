@@ -10,7 +10,7 @@ public class IntTreeList implements TreeList{
 
     @Override
     public IntValue put_(String token, RowValue row) {
-        System.out.println("ICI c'est int");
+        //System.out.println("ICI c'est int");
         if(token.equals("")){
             putnull(row);
             return null;
