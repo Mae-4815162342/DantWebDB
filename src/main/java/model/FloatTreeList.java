@@ -9,24 +9,31 @@ public class FloatTreeList implements TreeList{
 
 
     @Override
-    public FloatValue put(String token, RowValue row) {
+    public FloatValue put_(String token, RowValue row) {
+        System.out.println("ICI c'est float");
+        float v1=Float.parseFloat(token);
         if(token.equals("")){
             putnull(row);
             return null;
         }
         int debut=0;
         int fin= values.size();
-        float v1=Float.parseFloat(token);
         FloatValue value;
         if(fin==0){
             value=new FloatValue(v1,row);
             values.add(value);
             return value;
         }
-        int i=(fin-debut)/2;
+        fin-=1;
+
+        int i=(int)((fin+debut)/2);
+        int j=i;
+
+        //System.out.println("taille :"+values.size()+ "index :"+i);
         value=values.get(i);
         float v2=value.getValue();
-        while(v2!=v1 && debut<=fin){
+        while(v1!=v2 && debut<=fin){
+
             if(v1>v2){
                 debut=i+1;
             }
@@ -34,13 +41,15 @@ public class FloatTreeList implements TreeList{
                 fin=i-1;
 
             }
+            j=i;
+            i=((fin+debut)/2);
             value=values.get(i);
             v2=value.getValue();
-            i=(fin-debut)/2;
         }
-        if(v2!=v1){
+        if(v1==v2){value.add(row);}
+        else{
             value=new FloatValue(v1,row);
-            values.add(i,value);
+            values.add(j,value);
         }
 
         return value;
@@ -60,6 +69,14 @@ public class FloatTreeList implements TreeList{
         FloatValue value=new FloatValue(Float.parseFloat(token),row);
         values.add(value);
         return value;
+    }
+
+    public void values(){
+        String s="[";
+        for(int i=0;i< values.size();i++){
+            s+=values.get(i)+",";
+        }
+        System.out.println(s+']') ;
     }
 
 }

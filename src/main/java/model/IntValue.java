@@ -22,6 +22,10 @@ public class IntValue implements Value{
         this.rows.add(row);
     }
 
+    public void add(RowValue value){
+        this.rows.add(value);
+    }
+
     public String toString(){
         return String.valueOf(value);
     }

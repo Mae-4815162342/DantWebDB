@@ -24,4 +24,9 @@ public class StringValue implements Value{
     public String toString(){
         return value;
     }
+
+
+    public void add(RowValue value){
+        this.rows.add(value);
+    }
 }

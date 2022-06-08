@@ -7,11 +7,11 @@ import java.util.stream.IntStream;
 
 public class TableTree {
     private String tableName;
-    private ArrayList<RowTree> rows;
+    private ArrayList<RowValue> rows;
     private LinkedHashMap<String, String> columns;
     private int len=0;
-    private ArrayList<Tree> values;
-    //private ArrayList<TreeList> values;
+    //private ArrayList<Tree> values;
+    private ArrayList<TreeList> values;
 
 
     public TableTree(String name, LinkedHashMap<String, String> columnsEntry){
@@ -19,11 +19,11 @@ public class TableTree {
         this.columns=columnsEntry;
         //this.rows=new ArrayList<>();
         this.values=new ArrayList<>();
-        for(Map.Entry<String,String> c:columnsEntry.entrySet()){
+        /*for(Map.Entry<String,String> c:columnsEntry.entrySet()){
             values.add(new Tree());
-        }
+        }*/
 
-        //initializeColumn();
+        initializeColumn();
         System.out.println(this.tableName+" created");
     }
 
@@ -35,8 +35,9 @@ public class TableTree {
 
     public  void insertEntry(String line) {
         String[]tokens = line.split(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)*(?=(?:[^;]*\"[^;]*\")*[^;]*$)");
-        //RowValue row= new RowValue();
-        RowTree row= new RowTree();
+
+        RowValue row= new RowValue();
+        //RowTree row= new RowTree();
 
         //int len= rows.size();
         //int clen=columns.size()-1;
@@ -61,23 +62,21 @@ public class TableTree {
 
 
         for(int i=0;i< tokens.length;i++){
-            //row[i]=
-            row.insert(values.get(i).put(tokens[i],row));
-            //values.get(i).put(tokens[i],row);
-            //System.out.println(len+" "+tokens[i]+" inserted ");
+            System.out.println(tokens[i]);
+
+            values.get(i).put_(tokens[i],row);
 
         }
         for(int i= tokens.length;i<columns.size();i++){
-            //row[i]=
-            row.insert(values.get(i).put(null,row));
-            //values.get(i).putnull(row);
-            //System.out.println(len+" "+tokens[i]+" inserted ");
+
+            values.get(i).putnull(row);
+
 
         }
 
         //len++;
-        //System.out.println(len);
-        rows.add(row);
+        System.out.println(rows.size());
+        //rows.add(row);
         //if(len%100000==0)
 
     }
@@ -98,23 +97,28 @@ public class TableTree {
     public void initialize() {
         this.values=new ArrayList<>();
         this.rows=new ArrayList<>();
-       for(Map.Entry<String,String> c:this.columns.entrySet()){
+       /*for(Map.Entry<String,String> c:this.columns.entrySet()){
             values.add(new Tree());
-        }
-       //initializeColumn();
+        }*/
+       initializeColumn();
         System.out.println(this.tableName+" created");
     }
 
-    /*public void initializeColumn(){
+    public void initializeColumn(){
         for(Map.Entry<String,String> c:this.columns.entrySet()){
-            if(c.getValue()=="float")
-                values.add(new FloatTreeList());
-            else if(c.getValue()=="int")
-                values.add(new IntTreeList());
-            else
-                values.add(new StringTreeList());
+
+            values.add(new StringTreeList());
+           if(c.getValue().equals("float")){
+               System.out.println(c.getKey()+"  FLOAT "+c.getValue());
+                values.add(new FloatTreeList());}
+            else if(c.getValue().equals("int")){
+               System.out.println(c.getKey()+" INT  "+c.getValue());
+                values.add(new IntTreeList());}
+            else{
+               System.out.println(c.getKey()+" STRING  "+c.getValue());
+                values.add(new StringTreeList());}
         }
-    }*/
+    }
 
     public String getall() {
        /* String res="Number\tof\trow :" +rows.size()+"\n";
@@ -123,6 +127,9 @@ public class TableTree {
             System.out.println(row.selectAll());
         }
         return res;*/
+        for (int i=0;i< values.size();i++){
+            values.get(i).values();
+        }
         return null;
     }
 }
