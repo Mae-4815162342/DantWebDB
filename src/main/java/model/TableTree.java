@@ -11,16 +11,19 @@ public class TableTree {
     private LinkedHashMap<String, String> columns;
     private int len=0;
     private ArrayList<Tree> values;
+    //private ArrayList<TreeList> values;
 
 
     public TableTree(String name, LinkedHashMap<String, String> columnsEntry){
         this.tableName=name;
         this.columns=columnsEntry;
-        this.rows=new ArrayList<>();
+        //this.rows=new ArrayList<>();
         this.values=new ArrayList<>();
         for(Map.Entry<String,String> c:columnsEntry.entrySet()){
             values.add(new Tree());
         }
+
+        //initializeColumn();
         System.out.println(this.tableName+" created");
     }
 
@@ -32,34 +35,60 @@ public class TableTree {
 
     public  void insertEntry(String line) {
         String[]tokens = line.split(";|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)*(?=(?:[^;]*\"[^;]*\")*[^;]*$)");
+        //RowValue row= new RowValue();
         RowTree row= new RowTree();
 
-        int len= rows.size();
-        int clen=columns.size()-1;
+        //int len= rows.size();
+        //int clen=columns.size()-1;
         /*IntStream.range(0, clen).parallel().forEach(i -> {
             row.add(values.get(i).insert(tokens[i],len));
             //System.out.println(len+" "+tokens[i]+" inserted ");
         });*/
 
         //System.out.println(len);
-        for(int i=0;i<columns.size();i++){
+        /*IntStream.range(0, tokens.length-1).mapToObj(i -> {
+            //System.out.println("--------------------------"+i);
+            row.insert(values.get(i).put(tokens[i],row));
+            values.get(i).put(tokens[i],row);
+            //System.out.println(len+" "+tokens[i]+" inserted ");
+        })
+                .parallel();*/
+       /* IntStream.range(tokens.length,columns.size() ).parallel().forEach(i -> {
+            row.insert(values.get(i).put(null,row));
+            values.get(i).put(null,row);
+            //System.out.println(len+" "+tokens[i]+" inserted ");
+        });*/
+
+
+        for(int i=0;i< tokens.length;i++){
             //row[i]=
             row.insert(values.get(i).put(tokens[i],row));
+            //values.get(i).put(tokens[i],row);
             //System.out.println(len+" "+tokens[i]+" inserted ");
 
         }
+        for(int i= tokens.length;i<columns.size();i++){
+            //row[i]=
+            row.insert(values.get(i).put(null,row));
+            //values.get(i).putnull(row);
+            //System.out.println(len+" "+tokens[i]+" inserted ");
+
+        }
+
+        //len++;
+        //System.out.println(len);
         rows.add(row);
         //if(len%100000==0)
-        //System.out.println(len);
 
     }
 
     public int getTableSize() {
-        return rows.size();
+        //return rows.size();
+        return len;
     }
-    public List<RowTree> getLines() {
+    /*public List<RowTree> getLines() {
         return rows;
-    }
+    }*/
     public LinkedHashMap<String, String> getColumns() {
         return columns;
     }
@@ -69,18 +98,31 @@ public class TableTree {
     public void initialize() {
         this.values=new ArrayList<>();
         this.rows=new ArrayList<>();
-        for(Map.Entry<String,String> c:this.columns.entrySet()){
+       for(Map.Entry<String,String> c:this.columns.entrySet()){
             values.add(new Tree());
         }
+       //initializeColumn();
         System.out.println(this.tableName+" created");
     }
 
+    /*public void initializeColumn(){
+        for(Map.Entry<String,String> c:this.columns.entrySet()){
+            if(c.getValue()=="float")
+                values.add(new FloatTreeList());
+            else if(c.getValue()=="int")
+                values.add(new IntTreeList());
+            else
+                values.add(new StringTreeList());
+        }
+    }*/
+
     public String getall() {
-        String res="Number\tof\trow :" +rows.size()+"\n";
+       /* String res="Number\tof\trow :" +rows.size()+"\n";
         for (RowTree row:rows) {
-            //res+=row.selectAll();
+            res+=row.selectAll();
             System.out.println(row.selectAll());
         }
-        return res;
+        return res;*/
+        return null;
     }
 }

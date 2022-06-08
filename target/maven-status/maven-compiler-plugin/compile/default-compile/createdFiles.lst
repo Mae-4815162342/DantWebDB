@@ -1,5 +1,6 @@
 exception\InvalidSelectRequestException.class
 exception\SelectException.class
+model\TreeList.class
 model\requests\BasicSchema.class
 storage\Storage.class
 endpoints\InsertDataEndpoint.class
@@ -23,12 +24,15 @@ model\StringNode.class
 exception\UnknownTypeOfSelect.class
 model\requests\FindManySelect$1.class
 model\requests\Update.class
+model\RowValue.class
 endpoints\SelectEndpoint.class
 network\Network$1.class
 controller\Worker.class
+model\Value.class
 model\requests\GroupBy.class
 app\App.class
 model\Tree.class
+model\FloatValue.class
 model\requests\filters_operators\OR.class
 exception\InvalidUpdateRequestException.class
 model\ColumnTree.class
@@ -36,6 +40,9 @@ endpoints\SelectEndpoint$1.class
 endpoints\DeleteEndpoint.class
 exception\RuntimeExceptionMapper.class
 model\requests\filters_operators\AND.class
+model\IntTreeList.class
+model\StringValue.class
+model\IntValue.class
 model\requests\filters_operators\Filter.class
 network\Network.class
 storage\RowStorage.class
@@ -48,6 +55,8 @@ model\requests\FindManySelect.class
 model\requests\filters_operators\Operator.class
 model\ValueTree.class
 model\Table.class
+model\StringTreeList.class
 model\Database.class
+model\FloatTreeList.class
 utils\SendTask.class
 model\TableTree.class

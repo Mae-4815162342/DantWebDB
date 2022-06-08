@@ -108,6 +108,7 @@ public class InsertDataEndpoint {
         executorService.shutdown();
         inputStream.close();
         buffer.close();
+        System.gc();
         long heapSize = Runtime.getRuntime().totalMemory();
         long heapFreeSize = Runtime.getRuntime().freeMemory();
         System.out.println("heap size :"+heapSize);

@@ -14,7 +14,7 @@ public class Tree {
 
 
     public String put(String key, RowTree row) {
-        if(key.isBlank()){
+        if(key==null||key.isBlank()){
             nullList.add(row);
             return null;
         }
