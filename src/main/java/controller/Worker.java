@@ -77,8 +77,12 @@ public class Worker {
         } else {
             switch (type) {
                 case "findUnique":
-                    currentSelect = gson.fromJson(jsonStr, FindUniqueSelect.class);
+                    currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
+                    ((FindManySelect)currentSelect).setLimit(1);
                     break;
+                case "groupBy":
+                    currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
+                    ((FindManySelect)currentSelect).setLimit(-1);
                 default:
                     currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
                     break;

@@ -41,7 +41,7 @@ public class SelectEndpoint {
       int tableSize = worker.getTableByName(tableName).getTableSize();
 
       //checking local selection params :
-      //if the request comes from an other node or the request has a limit inferior to the number of lines in the local table without select or group by or aggregation,
+      //if the request has a limit inferior to the number of lines in the local table without select or group by or aggregation,
       //we don't need to call other nodes
       if((!worker.reqHasWhere() && !worker.reqIsGroupBy() &&!worker.reqIsAggregate() && worker.reqLimit() < tableSize && worker.reqLimit() > 0)) {
         Worker.getInstance().select();

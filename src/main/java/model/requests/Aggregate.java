@@ -96,15 +96,11 @@ public class Aggregate implements SelectSchema{
     }
   } 
 
-  private void count(Row row, HashMap<String, String> machineRow){
+  private void count(Row row){
     if(_count!=null){
       HashMap<String,Double> value = result.get("_count");
       List<String> rowList;
-      if(row != null) {
-        rowList = row.toList();
-      } else {
-        rowList = new ArrayList<>(machineRow.values());
-      }
+      rowList = row.toList();
       for(String targetLabels : _count){
         if(targetLabels.equals("_all")|| (!targetLabels.equals("_all") && !rowList.get(columnLabel.indexOf(targetLabels)).equals(""))){
           value.replace(targetLabels, value.get(targetLabels), value.get(targetLabels) + 1);
@@ -112,16 +108,12 @@ public class Aggregate implements SelectSchema{
       }
     }
   }
-  private void average(Row row, HashMap<String, String> machineRow){
+  private void average(Row row){
     if(_avg!=null){
       average_total++;
       HashMap<String,Double> value = result.get("_avg");
       List<String> rowList;
-      if(row != null) {
-        rowList = row.toList();
-      } else {
-        rowList = new ArrayList<>(machineRow.values());
-      }
+      rowList = row.toList();
       for(String targetLabels : _avg){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -131,15 +123,11 @@ public class Aggregate implements SelectSchema{
       }
     }
   }
-  private void maximum(Row row, HashMap<String, String> machineRow){
+  private void maximum(Row row){
     if(_max!=null){
       HashMap<String,Double> value = result.get("_max");
       List<String> rowList;
-      if(row != null) {
-        rowList = row.toList();
-      } else {
-        rowList = new ArrayList<>(machineRow.values());
-      }
+      rowList = row.toList();
       for(String targetLabels : _max){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -152,15 +140,11 @@ public class Aggregate implements SelectSchema{
     }
   }
 
-  private void minimum(Row row, HashMap<String, String> machineRow){
+  private void minimum(Row row){
     if(_min!=null){
       HashMap<String,Double> value = result.get("_min");
       List<String> rowList;
-      if(row != null) {
-        rowList = row.toList();
-      } else {
-        rowList = new ArrayList<>(machineRow.values());
-      }
+      rowList = row.toList();
       for(String targetLabels : _min){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -172,15 +156,11 @@ public class Aggregate implements SelectSchema{
       }
     }
   }
-  private void sum(Row row, HashMap<String, String> machineRow){
+  private void sum(Row row){
     if(_sum!=null){
       HashMap<String,Double> value = result.get("_sum");
       List<String> rowList;
-      if(row != null) {
-        rowList = row.toList();
-      } else {
-        rowList = new ArrayList<>(machineRow.values());
-      }
+      rowList = row.toList();
       for(String targetLabels : _sum){
         if(!rowList.get(columnLabel.indexOf(targetLabels)).equals("")){
           double oldValue = (double) value.get(targetLabels);
@@ -190,31 +170,10 @@ public class Aggregate implements SelectSchema{
       }
     }
   }
-  /* private List<HashMap<String,String>> orderResult(List<HashMap<String,String>> res, LinkedHashMap<String, String> columnLabel){
-    res.sort(new Comparator<HashMap<String,String>>() {
-      @Override
-      public int compare(HashMap<String,String> a, HashMap<String,String> b) {
-        int res = 0;
-          for(String targetcolumns : orderBy.keySet()){
-            String direction = orderBy.get(targetcolumns);
-            int dir = direction.equals("asc") ? 1 : -1;
-            String type = columnLabel.get(targetcolumns); 
-            if(type.equals("int")){
-              res += dir*Integer.compare(Integer.parseInt(a.get(targetcolumns)), Integer.parseInt(b.get(targetcolumns)));
-            }
-            else{
-              res += dir*a.get(targetcolumns).compareToIgnoreCase(b.get(targetcolumns));
-            }
-          }
-          return res;
-      }
-    });
-    return null;
-  } */
 
-  private synchronized void handleRow(Row row, HashMap<String, String> machineRow){
+  private synchronized void handleRow(Row row, boolean fromMachine){
     boolean valid = true;
-    if(row != null) {
+    if(!fromMachine) {
       List<String> values = row.toList();
       if (where != null) {
         for (String targetColumn : where.keySet()) {
@@ -227,11 +186,11 @@ public class Aggregate implements SelectSchema{
       }
     }
     if(valid){
-      count(row, machineRow);
-      average(row, machineRow);
-      maximum(row, machineRow);
-      minimum(row, machineRow);
-      sum(row, machineRow);
+      count(row);
+      average(row);
+      maximum(row);
+      minimum(row);
+      sum(row);
       if(limit != -1){
         limit = limit - 1;
       }
@@ -241,7 +200,7 @@ public class Aggregate implements SelectSchema{
   public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      handleRow(row, null);
+      handleRow(row, false);
       if(limit == 0){
         break;
       }
@@ -287,10 +246,12 @@ public class Aggregate implements SelectSchema{
     if(limit == 0){
       return;
     }
-    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
-      handleRow(null, row);
-      if(limit == 0){
-        break;
+    if(lines != null) {
+      for (HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines) {
+        handleRow(new Row(row, columnLabel), true);
+        if (limit == 0) {
+          break;
+        }
       }
     }
   }

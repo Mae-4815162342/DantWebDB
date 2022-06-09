@@ -14,6 +14,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.*;
@@ -39,7 +40,7 @@ public class InsertDataEndpoint {
      * - mutliple consumers thats takes out lines
      *       --> if the consumer has X lines it send a chunk to next peer
      * */
-    public void parseCSV(InputPart inputPart, String tableName) throws IOException, TableNotExistsException, InterruptedException {
+    public void parseCSV(InputPart inputPart, String tableName, int limit) throws IOException, TableNotExistsException, InterruptedException {
         InputStream inputStream = inputPart.getBody(InputStream.class, null);
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
         int NB_PEERS = Network.getInstance().getNumberOfPeers();
@@ -70,8 +71,11 @@ public class InsertDataEndpoint {
         };
         try {
             String line;
+            int nbLines = 0;
             while ((line = buffer.readLine()) != null) {
+                if(nbLines > limit) break;
                 if(!line.equals("")){
+                    nbLines ++;
                     if(j != MAX_LINES){
                         i++;
                         if(i % (NB_PEERS + 1) == 0){
@@ -92,7 +96,7 @@ public class InsertDataEndpoint {
                     }
                 } 
             }
-            if(j!=0){
+            if(j!=0 && nbLines < limit){
                 executorService.submit(pollTask);
                 while(!queue.isEmpty()){
 
@@ -116,6 +120,7 @@ public class InsertDataEndpoint {
         System.out.println("Receive request on /upload");
         final String UPLOADED_FILE_PARAMETER_NAME = "file";
         final String TABLE_NAME = "tableName";
+        final String LIMIT = "limit";
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 
         System.out.println("Creating stream");
@@ -123,13 +128,18 @@ public class InsertDataEndpoint {
         InputStream nameInputStream = tableNameInput.get(0).getBody(InputStream.class, null);
         String tableName = new String(IOUtils.toByteArray(nameInputStream));
 
+        List<InputPart> limitInput = uploadForm.get(LIMIT);
+        InputStream limitInputStream = limitInput.get(0).getBody(InputStream.class, null);
+        int limit = Integer.parseInt(new String(IOUtils.toByteArray(limitInputStream)));
+
         List<InputPart> inputParts = uploadForm.get(UPLOADED_FILE_PARAMETER_NAME);
 
         for (InputPart inputPart : inputParts) {
             System.out.println("Parsing CSV");
-            parseCSV(inputPart, tableName);
+            parseCSV(inputPart, tableName, limit);
         }
         nameInputStream.close();
+        limitInputStream.close();
         return Response.ok("Values from " + UPLOADED_FILE_PARAMETER_NAME + " inserted into " + tableName + "!").build();
     }
 

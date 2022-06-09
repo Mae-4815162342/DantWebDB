@@ -2,9 +2,7 @@ package model;
 import exception.TableExistsException;
 import exception.TableNotExistsException;
 import model.requests.Aggregate;
-import model.requests.BasicSchema;
 import model.requests.FindManySelect;
-import model.requests.FindUniqueSelect;
 import model.requests.GroupBy;
 import model.requests.SelectSchema;
 
@@ -81,33 +79,6 @@ public class Database {
     public Object getColumns(String tableName) throws Exception {
         Table table = this.getTableByName(tableName);
         return table.getColumns();
-    }
-
-    public Object select(String jsonStr, String type, String tableName) throws Exception {
-        SelectSchema select;
-        switch(type){
-            case "findUnique":
-                select = gson.fromJson(jsonStr, FindUniqueSelect.class);
-                break;
-            case "findMany":
-                select = gson.fromJson(jsonStr, FindManySelect.class);
-                break;
-            case "Aggregate":
-                select = gson.fromJson(jsonStr, Aggregate.class);
-                break;
-            case "groupBy":
-                select = gson.fromJson(jsonStr, GroupBy.class);
-                break;
-            default:
-                return null;
-        }
-        try {
-            select.run();
-            Object res = select.getRes();
-            return res;
-        } catch (Exception e) {
-            throw e;
-        }
     }
   
     public void insertChunkIntoTable(String tableName, ArrayList<String> entries) throws TableNotExistsException {
