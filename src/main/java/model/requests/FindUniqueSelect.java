@@ -18,33 +18,31 @@ public class FindUniqueSelect implements SelectSchema{
   private HashMap<String,String> result;
   private Set<String> selectedLabels;
 
-  private synchronized void handleRow(Row row, HashMap<String, String> machineRow){
+  private synchronized void handleRow(Row row, Boolean fromMachine){
     if(result != null){
       return;
     }
     boolean valid = true;
-    if(row != null) {
-      List<String> values = row.toList();
+    List<String> values = row.toList();
+    if(!fromMachine) {
       for (String targetColumn : where.keySet()) {
         if (!where.get(targetColumn).equals(values.get(columnLabel.indexOf(targetColumn)))) {
           valid = false;
         }
       }
-      if(valid){
-        result = new HashMap<>();
-        for(String targetColumn : selectedLabels){
-          result.put(targetColumn, values.get(columnLabel.indexOf(targetColumn)));
-        }
+    }
+    if(valid){
+      result = new HashMap<>();
+      for(String targetColumn : selectedLabels){
+        result.put(targetColumn, values.get(columnLabel.indexOf(targetColumn)));
       }
-    } else {
-      result = machineRow;
     }
   }
   
   public void run() throws ColumnNotExistsException {
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
-      handleRow(row, null);
+      handleRow(row, false);
       if(result != null) break;
     }
   }
@@ -88,7 +86,7 @@ public class FindUniqueSelect implements SelectSchema{
   public void addLines(Object lines) throws Exception {
     System.out.println(lines);
     for(HashMap<String, String> line : (List<HashMap<String, String>>) lines) {
-      handleRow(null, line);
+      handleRow(new Row(line, columnLabel), true);
     }
   }
 }

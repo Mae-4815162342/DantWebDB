@@ -1,8 +1,4 @@
 package model.requests;
-
-import java.util.HashMap;
-import java.util.List;
-
 import exception.ColumnNotExistsException;
 import exception.InvalidSelectRequestException;
 import exception.InvalidUpdateRequestException;

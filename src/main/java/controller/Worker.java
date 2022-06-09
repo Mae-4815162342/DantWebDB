@@ -59,9 +59,6 @@ public class Worker {
         Table table = database.getTableByName(tableName);
         if(fromClient) {
             switch (type) {
-                case "findUnique":
-                    currentSelect = gson.fromJson(jsonStr, FindUniqueSelect.class);
-                    break;
                 case "findMany":
                     currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
                     break;
@@ -77,8 +74,12 @@ public class Worker {
         } else {
             switch (type) {
                 case "findUnique":
-                    currentSelect = gson.fromJson(jsonStr, FindUniqueSelect.class);
+                    currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
+                    ((FindManySelect)currentSelect).setLimit(1);
                     break;
+                case "groupBy":
+                    currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
+                    ((FindManySelect)currentSelect).setLimit(-1);
                 default:
                     currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
                     break;

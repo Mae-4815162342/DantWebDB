@@ -41,8 +41,14 @@ public class FindManySelect implements SelectSchema {
 
       if (valid) {
         HashMap<String, String> resulatRow = new HashMap<String, String>();
-        for (String targetedColumn : select) {
-          resulatRow.put(targetedColumn, values.get(columnLabel.indexOf(targetedColumn)));
+        if(fromClient) {
+          for (String targetedColumn : select) {
+            resulatRow.put(targetedColumn, values.get(columnLabel.indexOf(targetedColumn)));
+          }
+        } else {
+          for (String targetedColumn : columnLabel) {
+            resulatRow.put(targetedColumn, values.get(columnLabel.indexOf(targetedColumn)));
+          }
         }
         result.add(resulatRow);
         if (limit != -1) {
@@ -103,6 +109,10 @@ public class FindManySelect implements SelectSchema {
 
   public int getLimit() {
     return this.limit;
+  }
+
+  public void setLimit(int i) {
+    limit = i;
   }
 
   @Override
