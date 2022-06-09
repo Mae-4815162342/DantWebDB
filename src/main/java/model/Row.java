@@ -23,7 +23,7 @@ public class Row {
             if(i == 0) {
                 line = line + values.get(columns.indexOf(localColumns.get(i)));
             } else {
-                line = line + "," + values.get(columns.indexOf(localColumns.get(i)));
+                line = line + ";" + values.get(columns.indexOf(localColumns.get(i)));
             }
         }
         this.columnValuesMap = line;
