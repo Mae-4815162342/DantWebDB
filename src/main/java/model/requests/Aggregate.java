@@ -13,6 +13,7 @@ import exception.InvalidSelectRequestException;
 import model.Row;
 import model.Table;
 import model.requests.filters_operators.Filter;
+import network.Network;
 
 public class Aggregate implements SelectSchema{
   private int limit = -1;
@@ -198,6 +199,7 @@ public class Aggregate implements SelectSchema{
   }
 
   public void run() throws ColumnNotExistsException, InvalidSelectRequestException {
+    limit = (int) limit / Network.getInstance().getNumberOfPeers();
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
       handleRow(row, false);
