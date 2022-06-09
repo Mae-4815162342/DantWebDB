@@ -22,4 +22,7 @@ public class RowTree {
         return res+"\n";
     }
 
+    public List<String> getValues() {
+        return values;
+    }
 }

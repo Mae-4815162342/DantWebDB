@@ -1,13 +1,13 @@
-package model;
+package model.TreeList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntValue implements Value{
-    private int value;
+public class FloatValue implements Value {
+    private float value;
     private List<RowValue> rows;
 
-    public int getValue() {
+    public float getValue() {
         return value;
     }
 
@@ -15,10 +15,9 @@ public class IntValue implements Value{
         return rows;
     }
 
-    public IntValue(int value,RowValue row){
+    public FloatValue(float value, RowValue row){
         this.value=value;
         this.rows=new ArrayList<>();
-
         this.rows.add(row);
     }
 
@@ -27,6 +26,6 @@ public class IntValue implements Value{
     }
 
     public String toString(){
-        return String.valueOf(value);
+        return (String.valueOf(value));
     }
 }

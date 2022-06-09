@@ -1,9 +1,9 @@
-package model;
+package model.TreeList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StringValue implements Value{
+public class StringValue implements Value {
     private String value;
     private List<RowValue> rows;
 

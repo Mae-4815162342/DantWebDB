@@ -1,26 +1,26 @@
-package model;
+package model.TreeList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FloatTreeList implements TreeList{
-    private List<FloatValue> values=new ArrayList<>();
+public class IntTreeList implements TreeList {
+    private List<IntValue> values=new ArrayList<>();
     private List<RowValue> nullValue=new ArrayList<>();
 
 
     @Override
-    public FloatValue put_(String token, RowValue row) {
-        //System.out.println("ICI c'est float");
-        float v1=Float.parseFloat(token);
+    public IntValue put_(String token, RowValue row) {
+        //System.out.println("ICI c'est int");
         if(token.equals("")){
             putnull(row);
             return null;
         }
+        int v1=Integer.parseInt(token);
         int debut=0;
         int fin= values.size();
-        FloatValue value;
+        IntValue value;
         if(fin==0){
-            value=new FloatValue(v1,row);
+            value=new IntValue(v1,row);
             values.add(value);
             return value;
         }
@@ -31,24 +31,23 @@ public class FloatTreeList implements TreeList{
 
         //System.out.println("taille :"+values.size()+ "index :"+i);
         value=values.get(i);
-        float v2=value.getValue();
+        int v2=value.getValue();
         while(v1!=v2 && debut<=fin){
 
-            if(v1>v2){
-                debut=i+1;
-            }
-            else{
-                fin=i-1;
-
-            }
+            if(v1>v2){debut=i+1;}
+            else{fin=i-1;}
             j=i;
             i=((fin+debut)/2);
             value=values.get(i);
             v2=value.getValue();
+
+
         }
-        if(v1==v2){value.add(row);}
+        if(v1==v2){
+            value.add(row);
+        }
         else{
-            value=new FloatValue(v1,row);
+            value=new IntValue(v1,row);
             values.add(j,value);
         }
 
@@ -61,12 +60,12 @@ public class FloatTreeList implements TreeList{
     }
 
     @Override
-    public FloatValue putfirst(String token, RowValue row) {
+    public Value putfirst(String token, RowValue row) {
         if(token.equals("")){
             putnull(row);
             return null;
         }
-        FloatValue value=new FloatValue(Float.parseFloat(token),row);
+        IntValue value=new IntValue((int)Integer.parseInt(token),row);
         values.add(value);
         return value;
     }
@@ -78,5 +77,4 @@ public class FloatTreeList implements TreeList{
         }
         System.out.println(s+']') ;
     }
-
 }

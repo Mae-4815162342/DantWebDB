@@ -1,4 +1,4 @@
-package model;
+package model.TreeList;
 
 public interface TreeList {
 

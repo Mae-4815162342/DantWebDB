@@ -1,10 +1,10 @@
-package model;
+package model.TreeList;
 
-import java.util.Comparator;
-import java.util.Objects;
+import model.IndexList;
+
 import java.util.TreeMap;
 
-public class ValueTree<Entry> extends TreeMap<String,IndexList> {
+public class ValueTree<Entry> extends TreeMap<String, IndexList> {
 /*
     @Override
     private IndexList putvalue(String key, IndexList value) {

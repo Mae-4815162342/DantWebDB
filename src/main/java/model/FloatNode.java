@@ -2,38 +2,38 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
-public class StringNode implements Node<StringNode>{
-    private StringNode parent;
-    private StringNode gauche;
-    private StringNode droite;
-    private String valeur;
+public class FloatNode implements Node<FloatNode> {
+
+    private FloatNode parent;
+    private FloatNode gauche;
+    private FloatNode droite;
+    private float valeur;
     private List<RowTree> liste;
     boolean color = true;//BLACK
 
 
-    public StringNode(String valeur,RowTree row,StringNode parent){
-        this.valeur=valeur;
+    public FloatNode(String valeur,RowTree row,FloatNode parent){
+        this.valeur=(float)Float.parseFloat(valeur);
         this.liste=new ArrayList<>();
         liste.add(row);
         this.parent=parent;
 
     }
 
-    public StringNode getParent() {
+    public FloatNode getParent() {
         return parent;
     }
 
-    public StringNode getGauche() {
+    public FloatNode getGauche() {
         return gauche;
     }
 
-    public StringNode getDroite() {
+    public FloatNode getDroite() {
         return droite;
     }
 
-    public String getValeur() {
+    public Float getValeur() {
         return valeur;
     }
 
@@ -45,14 +45,14 @@ public class StringNode implements Node<StringNode>{
         return color;
     }
 
-    public StringNode grandparent(){
+    public FloatNode grandparent(){
         if(this.parent==null){return null;}
         return this.parent.getParent();
     }
 
-    public void rotateRight(StringNode root) {
+    public void rotateRight(FloatNode root) {
         if (this != null) {
-            StringNode l = this.gauche;
+            FloatNode l = this.gauche;
             this.gauche = l.droite;
             if (l.droite != null) l.droite.parent = this;
             l.parent = this.parent;
@@ -66,9 +66,9 @@ public class StringNode implements Node<StringNode>{
         }
     }
 
-    public void rotateLeft(StringNode root) {
+    public void rotateLeft(FloatNode root) {
         if (this != null) {
-            StringNode r = this.droite;
+            FloatNode r = this.droite;
             this.droite = r.gauche;
             if (r.gauche != null)
                 r.gauche.parent = this;
@@ -83,6 +83,4 @@ public class StringNode implements Node<StringNode>{
             this.parent = r;
         }
     }
-
-
 }

@@ -5,7 +5,7 @@ import java.util.*;
 public class ColumnTree {
     private String type;
     private IndexList nulllist;
-    private TreeMap<String,IndexList> valuelist;
+    private TreeMap<String, IndexList> valuelist;
 
 
 
@@ -26,7 +26,7 @@ public class ColumnTree {
         for( int i=0;i< valuelist.size();i++){
             if(valuelist.get(keys[i]).equals(e)){
                 s=(String)keys[i];
-                l=IndexList.addElement(row,valuelist.get(keys[i]));
+                l= IndexList.addElement(row,valuelist.get(keys[i]));
                 valuelist.put(e,l);
                 return s;
             }

@@ -1,10 +1,9 @@
-package model;
+package model.TreeList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
 
-public class StringTreeList implements TreeList{
+public class StringTreeList implements TreeList {
     private List<StringValue> values=new ArrayList<>();
     private List<RowValue> nullValue=new ArrayList<>();
 

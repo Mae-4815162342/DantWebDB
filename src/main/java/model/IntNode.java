@@ -2,18 +2,26 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
-public class StringNode implements Node<StringNode>{
-    private StringNode parent;
-    private StringNode gauche;
-    private StringNode droite;
-    private String valeur;
+public class IntNode implements Node<IntNode>{
+
+    private IntNode parent;
+    private IntNode gauche;
+    private IntNode droite;
+    private int valeur;
     private List<RowTree> liste;
     boolean color = true;//BLACK
 
 
-    public StringNode(String valeur,RowTree row,StringNode parent){
+    public IntNode(String valeur,RowTree row,IntNode parent){
+        this.valeur=Integer.parseInt(valeur);
+        this.liste=new ArrayList<>();
+        liste.add(row);
+        this.parent=parent;
+
+    }
+
+    public IntNode(int valeur,RowTree row,IntNode parent){
         this.valeur=valeur;
         this.liste=new ArrayList<>();
         liste.add(row);
@@ -21,19 +29,19 @@ public class StringNode implements Node<StringNode>{
 
     }
 
-    public StringNode getParent() {
+    public IntNode getParent() {
         return parent;
     }
 
-    public StringNode getGauche() {
+    public IntNode getGauche() {
         return gauche;
     }
 
-    public StringNode getDroite() {
+    public IntNode getDroite() {
         return droite;
     }
 
-    public String getValeur() {
+    public Integer getValeur() {
         return valeur;
     }
 
@@ -45,14 +53,14 @@ public class StringNode implements Node<StringNode>{
         return color;
     }
 
-    public StringNode grandparent(){
+    public IntNode grandparent(){
         if(this.parent==null){return null;}
         return this.parent.getParent();
     }
 
-    public void rotateRight(StringNode root) {
+    public void rotateRight(IntNode root) {
         if (this != null) {
-            StringNode l = this.gauche;
+            IntNode l = this.gauche;
             this.gauche = l.droite;
             if (l.droite != null) l.droite.parent = this;
             l.parent = this.parent;
@@ -66,9 +74,9 @@ public class StringNode implements Node<StringNode>{
         }
     }
 
-    public void rotateLeft(StringNode root) {
+    public void rotateLeft(IntNode root) {
         if (this != null) {
-            StringNode r = this.droite;
+            IntNode r = this.droite;
             this.droite = r.gauche;
             if (r.gauche != null)
                 r.gauche.parent = this;
@@ -83,6 +91,5 @@ public class StringNode implements Node<StringNode>{
             this.parent = r;
         }
     }
-
 
 }

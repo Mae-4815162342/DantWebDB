@@ -91,8 +91,7 @@ public class FindManySelect implements SelectSchema {
       }
     }*/
     System.out.println("findMany run");
-    String res=table.getall();
-    this.resultString=res;
+    this.result=table.getall();
   }
 
   @Override
@@ -140,6 +139,6 @@ public class FindManySelect implements SelectSchema {
       orderResult(result, table.getColumns());
     }
     //return result;
-    return resultString;
+    return result;
   }
 }
