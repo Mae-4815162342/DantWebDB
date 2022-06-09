@@ -246,10 +246,12 @@ public class Aggregate implements SelectSchema{
     if(limit == 0){
       return;
     }
-    for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
-      handleRow(new Row(row, columnLabel), true);
-      if(limit == 0){
-        break;
+    if(lines != null) {
+      for (HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines) {
+        handleRow(new Row(row, columnLabel), true);
+        if (limit == 0) {
+          break;
+        }
       }
     }
   }

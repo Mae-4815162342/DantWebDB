@@ -59,6 +59,9 @@ public class Worker {
         Table table = database.getTableByName(tableName);
         if(fromClient) {
             switch (type) {
+                case "findUnique":
+                    currentSelect = gson.fromJson(jsonStr, FindUniqueSelect.class);
+                    break;
                 case "findMany":
                     currentSelect = gson.fromJson(jsonStr, FindManySelect.class);
                     break;

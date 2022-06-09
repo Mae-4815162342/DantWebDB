@@ -289,6 +289,7 @@ public class GroupBy implements SelectSchema {
 
   @Override
   public void addLines(Object lines) throws Exception {
+    if(lines == null) return;
     for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){
       handleRow(new Row(row, columnLabel), true);
     }

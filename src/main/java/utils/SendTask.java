@@ -23,7 +23,6 @@ public class SendTask implements Callable<Void> {
     }
     public Void call() throws Exception {
         Object res = Network.getInstance().sendSelectToPeer(ipAddress, json, table, type, "/get-machine", MediaType.APPLICATION_JSON);
-        System.out.println("RES:"  + res);
         Worker.getInstance().addLinesToAnswer(res);
         return null;
     }

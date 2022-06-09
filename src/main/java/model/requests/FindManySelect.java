@@ -127,7 +127,7 @@ public class FindManySelect implements SelectSchema {
 
   @Override
   public void addLines(Object lines) {
-    if(limit == 0){
+    if(limit == 0 || lines == null){
       return;
     }
     for(HashMap<String, String> row : (ArrayList<HashMap<String, String>>) lines){

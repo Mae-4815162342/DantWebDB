@@ -84,7 +84,7 @@ public class FindUniqueSelect implements SelectSchema{
 
   @Override
   public void addLines(Object lines) throws Exception {
-    System.out.println(lines);
+    if(lines == null) return;
     for(HashMap<String, String> line : (List<HashMap<String, String>>) lines) {
       handleRow(new Row(line, columnLabel), true);
     }
