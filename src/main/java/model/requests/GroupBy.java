@@ -251,6 +251,10 @@ public class GroupBy implements SelectSchema {
     List<Row> lines = table.getLines().selectAll();
     for(Row row : lines){
       handleRow(row, false);
+      limit--;
+      if(limit==0){
+        break;
+      }
     }
   }
 
